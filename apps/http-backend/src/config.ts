@@ -1,0 +1,1 @@
+export const JWT_SEC = "231312313"
