@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt,{JwtPayload} from "jsonwebtoken"
-import { JWT_SEC } from "./config";
+import { JWT_SEC } from "@repo/backend-common/config";
 
 interface DecodedToken extends JwtPayload{
     userId:string
