@@ -18,6 +18,18 @@ model User{
   id Int @default(autoincrement()) @id
   username String @unique
   password String
+  email String @unique
   photo String? @default("")
   name String
+  createdAt DateTime @default(now())
+  room Room[]
+}
+
+
+model Room{
+  id Int @default(autoincrement()) @id
+  slug String @unique
+  createdAt DateTime @default(now())
+  adminid Int
+  admin User @relation(fields: [adminid], references: [id])
 }

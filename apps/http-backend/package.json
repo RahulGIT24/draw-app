@@ -14,12 +14,12 @@
     "@types/jsonwebtoken": "^9.0.8",
     "bcrypt": "^5.1.1",
     "express": "^4.21.2",
+    "@repo/db": "workspace:*",
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@repo/backend-common": "workspace:*",
     "@repo/common": "workspace:*",
-    "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*"
   },
   "author": "",

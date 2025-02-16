@@ -9,6 +9,11 @@ interface DecodedToken extends JwtPayload{
 export function middleware(req:Request,res:Response,next:NextFunction){
     const token = req.headers["authorization"] ?? "";
 
+    if(!token){
+        res.status(403).json({"message":"Token not found"})
+        return;
+    }
+
     const decoded  = jwt.verify(token,JWT_SEC) as DecodedToken;
 
     if(typeof decoded === "string"){
