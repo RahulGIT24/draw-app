@@ -5,10 +5,16 @@ import { middleware } from "./middleware";
 import { client } from "@repo/db/prisma"
 import bcrypt from "bcrypt"
 import { CreateRoomSchema, CreateUserSchema, SignInSchema } from "@repo/common/zod"
+import cors from "cors"
 
 const app = express();
 
 app.use(express.json())
+app.use(cors(
+    {
+        origin:"*"
+    }
+))
 
 const PORT = 5000
 
@@ -91,7 +97,7 @@ app.post("/signup", async (req, res) => {
         })
 
         if (checkUser) {
-            res.status(201).json({ "message": "Username already taken" })
+            res.status(400).json({ "message": "Username or email already taken" })
             return;
         }
 

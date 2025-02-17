@@ -16,23 +16,27 @@ interface User {
 const users: User[] = [];
 
 function checkUser(token: string): string | null {
-
-    if (!token) {
+    try {
+        if (!token) {
+            return null
+        }
+    
+        // validate the token by jwt.verify
+        const decoded = jwt.verify(token, JWT_SEC)
+    
+        if (typeof decoded == "string") {
+            return null
+        }
+    
+        if (!decoded || !decoded.userId) {
+            return null
+        }
+    
+        return decoded.userId
+        
+    } catch (error) {
         return null
     }
-
-    // validate the token by jwt.verify
-    const decoded = jwt.verify(token, JWT_SEC)
-
-    if (typeof decoded == "string") {
-        return null
-    }
-
-    if (!decoded || !decoded.userId) {
-        return null
-    }
-
-    return decoded.userId
 }
 
 wss.on('connection', (ws, request) => {
