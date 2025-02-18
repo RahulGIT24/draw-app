@@ -40,7 +40,6 @@ export default function RoomCanvas() {
                 }
             })
             setValid(true);
-            console.log(res);
         } catch (error: any) {
             if (error.response.status === 404) {
                 toast.error("Invalid Room Id")
@@ -48,8 +47,8 @@ export default function RoomCanvas() {
             }
             // not authorized
             if (error.response.status === 403) {
-                router.push("/signin")
                 localStorage.removeItem("token");
+                router.push("/signin")
                 toast.error('Session Expired')
             }
         }
