@@ -56,7 +56,7 @@ export function AuthPage({ isSignIn }: {
                 identifier: result.data?.identifier,
                 password: result.data?.password,
             })
-            console.log(res);
+            localStorage.setItem("token",res.data.token);
             router.push("/")
         } catch (error:any) {
             toast.error(error.response.data.message)

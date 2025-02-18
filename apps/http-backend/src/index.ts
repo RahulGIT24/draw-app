@@ -4,7 +4,7 @@ import { EXPIRY, JWT_SEC } from "@repo/backend-common/config";
 import { middleware } from "./middleware";
 import { client } from "@repo/db/prisma"
 import bcrypt from "bcrypt"
-import { CreateRoomSchema, CreateUserSchema, SignInSchema } from "@repo/common/zod"
+import { CreateRoomSchema, CreateShapeSchema, CreateUserSchema, SignInSchema } from "@repo/common/zod"
 import cors from "cors"
 
 const app = express();
@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json())
 app.use(cors(
     {
-        origin:"*"
+        origin: "*"
     }
 ))
 
@@ -139,6 +139,237 @@ app.post("/room", middleware, async (req, res) => {
         return
     } catch (error) {
         res.status(411).json({ "message": "Room with same slug already exists" })
+        return;
+    }
+})
+
+app.get("/rooms", middleware, async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+        if (typeof roomId !== "string") {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+
+        if (isNaN(parseInt(roomId))) {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+        const userId = parseInt(req.userId);
+
+
+        const rooms = await client.room.findMany({
+            where: {
+                adminid: userId
+            },
+            select: {
+                id: true,
+                slug: true,
+                createdAt: true
+            }
+        })
+        res.status(200).json({ "rooms": rooms })
+        return;
+    } catch (error) {
+        res.status(500).json({ "message": "Internal Server Error" })
+        return;
+    }
+})
+app.get("/rooms", middleware, async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+        if (!roomId) {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+        if (!isNaN(parseInt(roomId))) {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+        const userId = parseInt(req.userId);
+
+
+        const rooms = await client.room.findMany({
+            where: {
+                adminid: userId
+            },
+            select: {
+                id: true,
+                slug: true,
+                createdAt: true
+            }
+        })
+        res.status(200).json({ "rooms": rooms })
+        return;
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ "message": "Internal Server Error" })
+        return;
+    }
+})
+app.get("/room/:roomId", middleware, async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+
+        if (!roomId) {
+            res.status(400).json({ message: "Please Provide Room Id" });
+            return
+        }
+
+        // ✅ Corrected validation check
+        if (isNaN(Number(roomId))) {
+            res.status(400).json({ message: "Invalid Room Id" });
+            return
+        }
+
+        const room = await client.room.findFirst({
+            where: {
+                id: Number(roomId), // Convert to number properly
+            },
+        });
+
+        if (!room) {
+            res.status(404).json({ message: "Room not found" });
+            return
+        }
+
+        res.status(200).json({ room });
+        return
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+        return
+    }
+});
+
+
+app.get("/rooms", middleware, async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+        if (typeof roomId !== "string") {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+
+        if (isNaN(parseInt(roomId))) {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+        const userId = parseInt(req.userId);
+
+
+        const rooms = await client.room.findMany({
+            where: {
+                adminid: userId
+            },
+            select: {
+                id: true,
+                slug: true,
+                createdAt: true
+            }
+        })
+        res.status(200).json({ "rooms": rooms })
+        return;
+    } catch (error) {
+        res.status(500).json({ "message": "Internal Server Error" })
+        return;
+    }
+})
+
+
+app.get('/get-existing-shapes/:roomId', middleware, async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+        if (typeof roomId !== "string") {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+
+        if (isNaN(parseInt(roomId))) {
+            res.status(400).json({ "message": "Invalid Room Id" })
+            return;
+        }
+
+        // are you part of that room
+        // const userId = parseInt(req.userId);
+
+        const shapes = await client.shape.findMany({
+            where: {
+                roomId: parseInt(roomId)
+            },
+            include: {
+                room: {
+                    select: {
+                        id: true,
+                        adminid: true,
+                        slug: true
+                    }
+                },
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true
+                    }
+                }
+            }
+        })
+
+        res.status(200).json({ "shapes": shapes })
+        return;
+
+    } catch (error) {
+        res.status(500).json({ "message": "Internal Server Error" })
+        return;
+    }
+})
+
+app.post("/add-shapes/:roomId", middleware, async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+
+        const dataValid = CreateShapeSchema.safeParse(req.body);
+        if (!dataValid.success) {
+            res.status(400).json({ "message": dataValid.error.errors[0]?.message ?? "Invalid Input" })
+            return;
+        }
+
+        const userId = req.userId;
+
+        if (isNaN(Number(roomId))) {
+            res.status(400).json({ "message": "Invalid Room Id" });
+            return;
+        }
+
+        const roomExist = await client.room.findFirst({
+            where: {
+                id: Number(roomId)
+            }
+        })
+
+        if (!roomExist) {
+            res.status(404).json({ "message": "Room Not Exist" });
+            return;
+        }
+
+        const shape = await client.shape.create({
+            data: {
+                height: dataValid.data.height,
+                type: dataValid.data.type,
+                fillStyle: dataValid.data.fillStyle,
+                strokeStyle: dataValid.data.strokeStyle,
+                width: dataValid.data.width,
+                x: dataValid.data.x,
+                y: dataValid.data.y,
+                roomId: Number(roomId),
+                userId: Number(userId)
+            }
+        })
+
+        res.status(200).json({ "message": "Shape Created", shape })
+        return;
+    } catch (error) {
+        res.status(500).json({ "message": "Internal Server Error" })
         return;
     }
 })

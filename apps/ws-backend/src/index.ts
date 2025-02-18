@@ -1,7 +1,8 @@
 import { WebSocket, WebSocketServer } from "ws";
 import jwt from "jsonwebtoken"
-import { JOIN_ROOM, JWT_SEC, LEAVE_ROOM } from "@repo/backend-common/config"
+import { JOIN_ROOM, LEAVE_ROOM } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
+import { JWT_SEC } from "@repo/backend-common/config";
 
 const PORT = 8000;
 
@@ -13,7 +14,7 @@ interface User {
     userId: string
 }
 
-const users: User[] = [];
+const users: User[] = []
 
 function checkUser(token: string): string | null {
     try {
@@ -59,13 +60,28 @@ wss.on('connection', (ws, request) => {
         ws
     })
 
-    ws.on('message', async (message) => {
-        if (typeof message != "string") {
-            return
-        }
+    ws.on('message', async (message:string) => {
+
         const data = JSON.parse(message);
 
         const type = data.type;
+        
+        if(type==="SHAPE"){
+            const shape = data.shape;
+            const roomId = data.roomId
+
+            const roomUsers = users.filter(user => user.rooms.includes(roomId));
+
+            roomUsers.forEach(user=>{
+                if(user.ws !== ws && user.ws.readyState === WebSocket.OPEN){
+                    user.ws.send(JSON.stringify({
+                        type:"DRAW_SHAPE",
+                        shape:shape
+                    }))
+                }
+            })
+
+        }
 
         if (type === JOIN_ROOM) {
             const roomId = data.roomId;
@@ -77,7 +93,7 @@ wss.on('connection', (ws, request) => {
             // check for room in db
             const room = await client.room.findFirst({
                 where: {
-                    id: roomId
+                    id: Number(roomId)
                 }
             })
 
@@ -90,7 +106,6 @@ wss.on('connection', (ws, request) => {
             if (!user) return;
 
             user.rooms.push(roomId);
-
         }
 
         if (type === LEAVE_ROOM) {

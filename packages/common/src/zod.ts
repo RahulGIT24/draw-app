@@ -15,3 +15,13 @@ export const SignInSchema = z.object({
 export const CreateRoomSchema = z.object({
     slug:z.string().min(3,{message:"Slug should have minimum 3 characters"}).max(20,{message:"Slug should have max of 20 characters"}),
 })
+
+export const CreateShapeSchema = z.object({
+    type:z.string({message:"Type is required"}),
+    x:z.number({message:"X axis is required"}),
+    y:z.number({message:"Y axis is required"}),
+    width:z.number({message:"width axis is required"}),
+    height:z.number({message:"height axis is required"}),
+    strokeStyle:z.string({message:"stroke style axis is required"}),
+    fillStyle:z.string({message:"fill style axis is required"}),
+})

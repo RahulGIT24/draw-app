@@ -23,6 +23,7 @@ model User{
   name String
   createdAt DateTime @default(now())
   room Room[]
+  Shapes Shape[]
 }
 
 
@@ -32,4 +33,20 @@ model Room{
   createdAt DateTime @default(now())
   adminid Int
   admin User @relation(fields: [adminid], references: [id])
+  Shapes Shape[]
+}
+
+model Shape{
+  id Int @default(autoincrement()) @id
+  type String
+  x Int?
+  y Int?
+  width Int?
+  height Int?
+  strokeStyle String
+  fillStyle String
+  roomId Int
+  userId Int
+  room Room @relation(fields: [roomId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }

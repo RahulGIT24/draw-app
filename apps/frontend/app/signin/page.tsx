@@ -1,5 +1,11 @@
 import { AuthPage } from "../components/AuthPage";
+import NavBar from "../components/Navbar";
 
 export default function SignIn(){
-    return <AuthPage isSignIn={true}/>
+    return (
+        <>
+        <NavBar />
+    <AuthPage isSignIn={true}/>
+        </>
+)
 }   

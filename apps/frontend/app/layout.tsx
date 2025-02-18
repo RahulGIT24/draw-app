@@ -19,6 +19,8 @@ export const metadata: Metadata = {
   description: "A Collaborating Drawing App",
 };
 
+// className="min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/bg.jpg')"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,12 +28,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className="min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/bg.jpg')" }}
-      >
-        <NavBar/>
+      <body>
+        {/* <NavBar /> */}
         {children}
-        <Toaster/>
+        <Toaster />
       </body>
     </html>
   );
