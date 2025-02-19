@@ -327,6 +327,7 @@ app.get('/get-existing-shapes/:roomId', middleware, async (req, res) => {
 app.post("/add-shapes/:roomId", middleware, async (req, res) => {
     try {
         const roomId = req.params.roomId;
+        console.log(req.body)
 
         const dataValid = CreateShapeSchema.safeParse(req.body);
         if (!dataValid.success) {
@@ -352,8 +353,9 @@ app.post("/add-shapes/:roomId", middleware, async (req, res) => {
             return;
         }
 
-        const shape = await client.shape.create({
-            data: {
+        let insertData = null;
+        if(dataValid.data.type=='rect'){
+            insertData = {
                 height: dataValid.data.height,
                 type: dataValid.data.type,
                 fillStyle: dataValid.data.fillStyle,
@@ -364,6 +366,28 @@ app.post("/add-shapes/:roomId", middleware, async (req, res) => {
                 roomId: Number(roomId),
                 userId: Number(userId)
             }
+        }else if(dataValid.data.type=='circle'){
+            insertData = {
+                x: dataValid.data.centerX,
+                type: dataValid.data.type,
+                fillStyle: dataValid.data.fillStyle,
+                strokeStyle: dataValid.data.strokeStyle,
+                y: dataValid.data.centerY,
+                startAngle: dataValid.data.startAngle,
+                endAngle: dataValid.data.endAngle,
+                roomId: Number(roomId),
+                userId: Number(userId),
+                radius:dataValid.data.radius
+            }
+        }
+
+        if(!insertData){
+            res.status(400).json({ "message": "Invalid Data to insert" })
+            return;
+        }
+
+        const shape = await client.shape.create({
+            data: insertData
         })
 
         res.status(200).json({ "message": "Shape Created", shape })

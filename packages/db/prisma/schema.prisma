@@ -39,14 +39,17 @@ model Room{
 model Shape{
   id Int @default(autoincrement()) @id
   type String
-  x Int?
-  y Int?
+  x Float?
+  y Float?
   width Int?
   height Int?
   strokeStyle String
   fillStyle String
   roomId Int
+  radius Float?
   userId Int
+  startAngle Float?
+  endAngle Float?
   room Room @relation(fields: [roomId], references: [id])
   user User @relation(fields: [userId], references: [id])
 }

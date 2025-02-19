@@ -14,14 +14,27 @@ export const SignInSchema = z.object({
 
 export const CreateRoomSchema = z.object({
     slug:z.string().min(3,{message:"Slug should have minimum 3 characters"}).max(20,{message:"Slug should have max of 20 characters"}),
-})
+});
 
-export const CreateShapeSchema = z.object({
-    type:z.string({message:"Type is required"}),
-    x:z.number({message:"X axis is required"}),
-    y:z.number({message:"Y axis is required"}),
-    width:z.number({message:"width axis is required"}),
-    height:z.number({message:"height axis is required"}),
-    strokeStyle:z.string({message:"stroke style axis is required"}),
-    fillStyle:z.string({message:"fill style axis is required"}),
-})
+export const CreateShapeSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("rect"),
+    x: z.number({ message: "X axis is required" }),
+    y: z.number({ message: "Y axis is required" }),
+    width: z.number({ message: "Width is required" }),
+    height: z.number({ message: "Height is required" }),
+    strokeStyle: z.string({ message: "Stroke style is required" }),
+    fillStyle: z.string({ message: "Fill style is required" }),
+  }),
+  z.object({
+    type: z.literal("circle"),
+    centerX: z.number({ message: "X axis is required" }),
+    centerY: z.number({ message: "Y axis is required" }),
+    radius: z.number({ message: "Radius is required" }),
+    startAngle: z.number({ message: "Start angle is required" }),
+    endAngle: z.number({ message: "End angle is required" }),
+    strokeStyle: z.string({ message: "Stroke style is required" }),
+    fillStyle: z.string({ message: "Fill style is required" }),
+  }),
+]);
+
