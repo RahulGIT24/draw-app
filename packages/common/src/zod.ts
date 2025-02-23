@@ -31,8 +31,6 @@ export const CreateShapeSchema = z.discriminatedUnion("type", [
     centerX: z.number({ message: "X axis is required" }),
     centerY: z.number({ message: "Y axis is required" }),
     radius: z.number({ message: "Radius is required" }),
-    startAngle: z.number({ message: "Start angle is required" }),
-    endAngle: z.number({ message: "End angle is required" }),
     strokeStyle: z.string({ message: "Stroke style is required" }),
     fillStyle: z.string({ message: "Fill style is required" }),
   }),

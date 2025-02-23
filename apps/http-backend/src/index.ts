@@ -373,8 +373,6 @@ app.post("/add-shapes/:roomId", middleware, async (req, res) => {
                 fillStyle: dataValid.data.fillStyle,
                 strokeStyle: dataValid.data.strokeStyle,
                 y: dataValid.data.centerY,
-                startAngle: dataValid.data.startAngle,
-                endAngle: dataValid.data.endAngle,
                 roomId: Number(roomId),
                 userId: Number(userId),
                 radius:dataValid.data.radius

@@ -1,48 +1,62 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { initDraw, Shape } from "../draw";
-import { Button } from "@repo/ui/button";
+import IconButton from "./IconButton";
+import { Circle, Pencil, RectangleHorizontalIcon } from "lucide-react"
+import { Game } from "../game/Game";
+
+type Tools = "circle" | "rect" | "pencil"
 
 export default function Canvas({ roomId, socket }: { roomId: string, socket: WebSocket }) {
-    const [currentShape, setCurrentShape] = useState("rect")
-    let existingShapes: Shape[] = []
+    const [windowW, setWindowW] = useState(window.innerWidth)
+    const [windowH, setWindowH] = useState(window.innerHeight)
+
+    const [game, setGame] = useState<Game>()
+
+    const [selectedTool, setSelectedTool] = useState<Tools>("rect");
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        if (roomId) {
-            initDraw(canvasRef, roomId, socket, currentShape,existingShapes)
+        if(game){
+            game.setShape(selectedTool);
         }
-    }, [canvasRef, currentShape, roomId, socket])
+    }, [game,selectedTool])
 
-    const shapes = [{
-        id: 1,
-        type: 'rect',
-        title: "Rectangle",
-        image: "/rectangle.svg",
-        onClick: () => {
-            setCurrentShape('rect')
+    useEffect(()=>{
+        if(canvasRef.current){
+            const g = new Game(canvasRef.current,roomId,socket)
+            setGame(g)
         }
-    }, {
-        id: 2,
-        type: 'circle',
-        title: "Circle",
-        image: "/circle.svg",
-        onClick: () => {
-            setCurrentShape('circle')
-        }
-    }]
+    },[canvasRef,roomId,socket])
 
     return (
         <>
-            <div className="absolute top-2 left-1/2 mt-6 -translate-x-1/2 flex gap-2 bg-zinc-800 justify-center border-transparent w-[50vw] border p-2 rounded-lg shadow-lg">
-                {shapes.map((shape) => (
-                    <Button classname={`px-2 py-1 text-white border border-transparent rounded bg-transparent ${shape.type == currentShape ? "bg-gray-300" : "bg-transparent"}`} key={shape.id} onClick={shape.onClick} image={shape.image} imageclass={`${shape.type === currentShape ? "invert-0" : "invert"}`} title={shape.title} />
-                ))}
-            </div>
-            <canvas ref={canvasRef} width={2000} height={1000} />
+            <canvas ref={canvasRef} width={windowW} height={windowH} />
+            <TopBar selectedTool={selectedTool} setSelectedTool={setSelectedTool} />
         </>
     );
+}
 
+function TopBar({ selectedTool, setSelectedTool }: {
+    selectedTool: Tools,
+    setSelectedTool: (t: Tools) => void
+}) {
+    return <div style={{
+        position: "fixed",
+        top: 10,
+        left: 10
+    }}>
+        <div className="flex justify-center items-center">
+            <IconButton icon={<Pencil />} onClick={() => {
+                setSelectedTool("pencil")
+            }} name="Line" activated={selectedTool === "pencil"} />
+            <IconButton icon={<RectangleHorizontalIcon />} onClick={() => {
+                setSelectedTool("rect")
+            }} name="Rectangle" activated={selectedTool === "rect"} />
+            <IconButton icon={<Circle />} onClick={() => {
+                setSelectedTool("circle")
+            }} name="Circle" activated={selectedTool === "circle"} />
+        </div>
+    </div>
 }

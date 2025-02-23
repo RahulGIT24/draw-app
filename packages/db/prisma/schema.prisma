@@ -48,8 +48,6 @@ model Shape{
   roomId Int
   radius Float?
   userId Int
-  startAngle Float?
-  endAngle Float?
   room Room @relation(fields: [roomId], references: [id])
   user User @relation(fields: [userId], references: [id])
 }
