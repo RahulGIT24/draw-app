@@ -27,8 +27,11 @@ export default function Canvas({ roomId, socket }: { roomId: string, socket: Web
         if(canvasRef.current){
             const g = new Game(canvasRef.current,roomId,socket)
             setGame(g)
+            return ()=>{
+                g.destroy()
+            }
         }
-    },[canvasRef,roomId,socket])
+    },[canvasRef])
 
     return (
         <>

@@ -1,4 +1,4 @@
-import { getExistingShapes } from "./http"
+import { addShapeInDB, getExistingShapes } from "./http"
 import { Shape, Shapes } from "../types/types"
 
 export class Game {
@@ -24,16 +24,13 @@ export class Game {
         this.startX = 0
         this.startY = 0
 
-        this.mouseDown = this.mouseDown.bind(this);
-        this.mouseMove = this.mouseMove.bind(this);
-        this.mouseUp = this.mouseUp.bind(this);
-
         this.init();
         this.initHandlers();
         this.initMouseEventHandlers();
     }
 
     setShape(shape: Shapes) {
+        console.log("Shape Set")
         this.selectedShape = shape
     }
 
@@ -69,6 +66,12 @@ export class Game {
         this.clearCanvas();
     }
 
+    destroy(){
+        this.canvas.removeEventListener("mousedown",this.mouseDown)
+        this.canvas.removeEventListener("mouseup",this.mouseUp)
+        this.canvas.removeEventListener("mousemove",this.mouseMove)
+    }
+
 
     initHandlers() {
         this.socket.onmessage = (event) => {
@@ -85,13 +88,13 @@ export class Game {
         }
     }
 
-    mouseDown(e: MouseEvent) {
+    mouseDown = async(e: MouseEvent)=> {
         this.clicked = true;
         this.startX = e.clientX;
         this.startY = e.clientY;
     }
 
-    async mouseUp(e: MouseEvent) {
+    mouseUp = async(e: MouseEvent) => {
         this.clicked = false;
         let width = e.clientX - this.startX;
         let height = e.clientY - this.startY;
@@ -122,7 +125,9 @@ export class Game {
                 endY:e.clientY,
             }
         }
-        
+
+        console.log(data);
+
         if (!data) return; // Ensure no unexpected behavior
         
         this.socket.send(JSON.stringify({
@@ -133,10 +138,10 @@ export class Game {
         
         this.existingShapes.push(data);
         this.clearCanvas();
-        // await addShapeInDB(this.roomId, data);
+        await addShapeInDB(this.roomId, data);
     }
 
-    mouseMove(e: MouseEvent) {
+    mouseMove = (e: MouseEvent) => {
         if (this.clicked) {
             let width = e.clientX - this.startX;
             let height = e.clientY - this.startY;
@@ -165,8 +170,8 @@ export class Game {
     }
 
     initMouseEventHandlers() {
-        this.canvas.addEventListener("mousedown", this.mouseDown);
-        this.canvas.addEventListener("mousemove", this.mouseMove);
-        this.canvas.addEventListener("mouseup", this.mouseUp);
+        this.canvas.addEventListener("mousedown",this.mouseDown);
+        this.canvas.addEventListener("mousemove",this.mouseMove);
+        this.canvas.addEventListener("mouseup",this.mouseUp);
     }
 }
