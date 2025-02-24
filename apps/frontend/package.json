@@ -9,13 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.2",
+    "@tabler/icons-react": "^3.30.0",
     "@types/websocket": "^1.0.10",
     "axios": "^1.7.9",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.4.7",
     "lucide-react": "^0.475.0",
+    "motion": "^12.4.7",
     "next": "15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sonner": "^1.7.4",
+    "tailwind-merge": "^3.0.2",
     "websocket": "^1.0.35"
   },
   "devDependencies": {

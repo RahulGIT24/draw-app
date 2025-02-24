@@ -11,7 +11,7 @@ const app = express();
 
 app.use(express.json())
 app.use(cors(
-    {
+    {   
         origin: "*"
     }
 ))
@@ -145,18 +145,7 @@ app.post("/room", middleware, async (req, res) => {
 
 app.get("/rooms", middleware, async (req, res) => {
     try {
-        const roomId = req.params.roomId;
-        if (typeof roomId !== "string") {
-            res.status(400).json({ "message": "Invalid Room Id" })
-            return;
-        }
-
-        if (isNaN(parseInt(roomId))) {
-            res.status(400).json({ "message": "Invalid Room Id" })
-            return;
-        }
         const userId = parseInt(req.userId);
-
 
         const rooms = await client.room.findMany({
             where: {
@@ -166,8 +155,12 @@ app.get("/rooms", middleware, async (req, res) => {
                 id: true,
                 slug: true,
                 createdAt: true
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
-        })
+        });
+        
         res.status(200).json({ "rooms": rooms })
         return;
     } catch (error) {
