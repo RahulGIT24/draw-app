@@ -1,6 +1,6 @@
 import express from "express"
 import jwt from "jsonwebtoken"
-import { EXPIRY, JWT_SEC } from "@repo/backend-common/config";
+import { JWT_SEC } from "@repo/backend-common/config";
 import { middleware } from "./middleware";
 import { client } from "@repo/db/prisma"
 import bcrypt from "bcrypt"
@@ -168,38 +168,7 @@ app.get("/rooms", middleware, async (req, res) => {
         return;
     }
 })
-app.get("/rooms", middleware, async (req, res) => {
-    try {
-        const roomId = req.params.roomId;
-        if (!roomId) {
-            res.status(400).json({ "message": "Invalid Room Id" })
-            return;
-        }
-        if (!isNaN(parseInt(roomId))) {
-            res.status(400).json({ "message": "Invalid Room Id" })
-            return;
-        }
-        const userId = parseInt(req.userId);
 
-
-        const rooms = await client.room.findMany({
-            where: {
-                adminid: userId
-            },
-            select: {
-                id: true,
-                slug: true,
-                createdAt: true
-            }
-        })
-        res.status(200).json({ "rooms": rooms })
-        return;
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ "message": "Internal Server Error" })
-        return;
-    }
-})
 app.get("/room/:roomId", middleware, async (req, res) => {
     try {
         const roomId = req.params.roomId;
@@ -209,7 +178,6 @@ app.get("/room/:roomId", middleware, async (req, res) => {
             return
         }
 
-        // ✅ Corrected validation check
         if (isNaN(Number(roomId))) {
             res.status(400).json({ message: "Invalid Room Id" });
             return
@@ -226,7 +194,14 @@ app.get("/room/:roomId", middleware, async (req, res) => {
             return
         }
 
-        res.status(200).json({ room });
+        if(room.adminid !== Number(req.userId) && room.collaboration === false){
+            res.status(401).json({ message: "You can't collaborate in this room. Ask the admin to turn on collaboration" });
+            return
+        }
+
+        let isAdmin = room.adminid === Number(req.userId);
+
+        res.status(200).json({ room ,isAdmin});
         return
     } catch (error) {
         console.error(error);
@@ -234,41 +209,6 @@ app.get("/room/:roomId", middleware, async (req, res) => {
         return
     }
 });
-
-
-app.get("/rooms", middleware, async (req, res) => {
-    try {
-        const roomId = req.params.roomId;
-        if (typeof roomId !== "string") {
-            res.status(400).json({ "message": "Invalid Room Id" })
-            return;
-        }
-
-        if (isNaN(parseInt(roomId))) {
-            res.status(400).json({ "message": "Invalid Room Id" })
-            return;
-        }
-        const userId = parseInt(req.userId);
-
-
-        const rooms = await client.room.findMany({
-            where: {
-                adminid: userId
-            },
-            select: {
-                id: true,
-                slug: true,
-                createdAt: true
-            }
-        })
-        res.status(200).json({ "rooms": rooms })
-        return;
-    } catch (error) {
-        res.status(500).json({ "message": "Internal Server Error" })
-        return;
-    }
-})
-
 
 app.get('/get-existing-shapes/:roomId', middleware, async (req, res) => {
     try {
@@ -283,8 +223,21 @@ app.get('/get-existing-shapes/:roomId', middleware, async (req, res) => {
             return;
         }
 
-        // are you part of that room
-        // const userId = parseInt(req.userId);
+        const room = await client.room.findFirst({
+            where:{
+                id:Number(roomId)
+            }
+        })
+
+        if(!room){
+            res.status(404).json({ "message": "Room Not Exist" })
+            return;
+        }
+
+        if(room.adminid!==Number(req.userId) && !room.collaboration){
+            res.status(401).json({ "message": "Unauthorized. You can't get shapes of this room" })
+            return;
+        }
 
         const shapes = await client.shape.findMany({
             where: {
@@ -328,7 +281,7 @@ app.post("/add-shapes/:roomId", middleware, async (req, res) => {
             return;
         }
 
-        const userId = req.userId;
+        const userId = Number(req.userId);
 
         if (isNaN(Number(roomId))) {
             res.status(400).json({ "message": "Invalid Room Id" });
@@ -343,6 +296,11 @@ app.post("/add-shapes/:roomId", middleware, async (req, res) => {
 
         if (!roomExist) {
             res.status(404).json({ "message": "Room Not Exist" });
+            return;
+        }
+
+        if(roomExist.collaboration===false && roomExist.adminid !== userId){
+            res.status(401).json({ "message": "You can't add shapes in this room" });
             return;
         }
 
@@ -384,6 +342,55 @@ app.post("/add-shapes/:roomId", middleware, async (req, res) => {
         res.status(200).json({ "message": "Shape Created", shape })
         return;
     } catch (error) {
+        res.status(500).json({ "message": "Internal Server Error" })
+        return;
+    }
+})
+
+// endpoint for making room collaborative
+app.put('/room/:roomId',middleware,async(req,res)=>{
+    try {
+        const {roomId} = req.params;
+        const userId = req.userId;
+        const {collaboration} = req.body;
+
+        if(typeof collaboration !== "boolean"){
+            res.status(400).json({ "message": "Invalid Collaboration type" })
+            return;
+        }
+
+        if(!roomId){
+            res.status(400).json({ "message": "Please Provide Room Id" })
+            return;
+        }
+
+        const room = await client.room.findFirst({
+            where:{
+                id:Number(roomId),
+                adminid:Number(userId)
+            }
+        })
+
+        if(!room){
+            res.status(401).json({ "message": "Unauthorized or room not exists" })
+            return;
+        }
+
+        await client.room.update({
+            where:{
+                id:Number(roomId),
+                adminid:Number(userId)
+            },
+            data:{
+                collaboration:collaboration
+            }
+        })
+
+        res.status(200).json({ "message": collaboration ? "Room Collaboration Started" : "Room Collaboration Stopped",collaboration })
+        return;
+
+    } catch (error) {
+        console.log(error)
         res.status(500).json({ "message": "Internal Server Error" })
         return;
     }
