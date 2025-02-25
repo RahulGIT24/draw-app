@@ -1,6 +1,6 @@
 import { WebSocket, WebSocketServer } from "ws";
 import jwt from "jsonwebtoken"
-import { JOIN_ROOM, LEAVE_ROOM } from "@repo/common/config"
+import { DRAW_SHAPE, JOIN_ROOM, LEAVE_ROOM, SHAPE } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
 import { JWT_SEC } from "@repo/backend-common/config";
 
@@ -66,7 +66,7 @@ wss.on('connection', (ws, request) => {
 
         const type = data.type;
         
-        if(type==="SHAPE"){
+        if(type===SHAPE){
             const shape = data.shape;
             const roomId = data.roomId
 
@@ -75,7 +75,7 @@ wss.on('connection', (ws, request) => {
             roomUsers.forEach(user=>{
                 if(user.ws !== ws && user.ws.readyState === WebSocket.OPEN){
                     user.ws.send(JSON.stringify({
-                        type:"DRAW_SHAPE",
+                        type:DRAW_SHAPE,
                         shape:shape
                     }))
                 }

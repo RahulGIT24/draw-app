@@ -7,6 +7,7 @@ import CreateRoomModal from "./CreateRoomModal";
 import { toast } from "sonner";
 import { HTTP_BACKEND } from "@repo/common/config";
 import axios from "axios";
+import JoinRoomModal from "./JoinRoomModal";
 
 type Card = {
     title: string,
@@ -74,6 +75,9 @@ export default function MainMenu() {
         <>
             {
                 createRoomModal && <CreateRoomModal roomSlug={roomSlug} setRoomSlug={setRoomSlug} setClose={setCreateRoomModal} onSubmit={() => { createRoom() }} />
+            }
+            {
+                collaborateModal && <JoinRoomModal setClose={setCollaborateModal} />
             }
             <FocusCards cards={cards} />
         </>

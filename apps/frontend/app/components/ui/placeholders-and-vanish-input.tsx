@@ -6,13 +6,13 @@ import { cn } from "../../lib/utils";
 
 export function PlaceholdersAndVanishInput({
   placeholders,
-  onChange,
+  // onChange,
   value,
   setValue,
   onSubmit,
 }: {
   placeholders: string[];
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   value:string,
   setValue:(e:string)=>void
@@ -196,7 +196,7 @@ export function PlaceholdersAndVanishInput({
         onChange={(e) => {
           if (!animating) {
             setValue(e.target.value);
-            onChange && onChange(e);
+            // onChange && onChange(e);
           }
         }}
         onKeyDown={handleKeyDown}

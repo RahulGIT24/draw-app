@@ -1,5 +1,6 @@
 import { addShapeInDB, getExistingShapes } from "./http"
 import { Shape, Shapes } from "../types/types"
+import { DRAW_SHAPE } from "@repo/common/config"
 
 export class Game {
 
@@ -76,7 +77,7 @@ export class Game {
     initHandlers() {
         this.socket.onmessage = (event) => {
             const message = JSON.parse(event.data);
-            if (message.type === "DRAW_SHAPE") {
+            if (message.type === DRAW_SHAPE) {
                 const shape = message.shape;
 
                 if (!shape) return;

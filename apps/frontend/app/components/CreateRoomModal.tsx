@@ -31,7 +31,7 @@ export default function CreateRoomModal({ roomSlug, setRoomSlug, onSubmit, setCl
         }} className="text-white fixed top-10 right-10 cursor-pointer z-40"><CircleX width={50} height={50} /></p>
         <PlaceholdersAndVanishInput
             placeholders={placeholders}
-            onChange={handleChange}
+            // onChange={handleChange}
             onSubmit={onSubmit}
             value={roomSlug}
             setValue={setRoomSlug}
