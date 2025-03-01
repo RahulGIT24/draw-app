@@ -1,1 +1,0 @@
-{"root":["./src/index.ts","./src/middleware.ts","./src/@types/express.d.ts","./src/controllers/shape.controller.ts","./src/routes/shape.routes.ts"],"version":"5.7.3"}
