@@ -20,7 +20,16 @@ export type Shape = {
     startX:number,
     startY:number,
     endX:number,
+    strokeStyle?: string,
+    fillStyle?: string,
     endY:number
+}|{
+    type:"triangle",
+    point1: { x: number; y: number };
+    point2: { x: number; y: number };
+    point3: { x: number; y: number };
+    strokeStyle?: string;
+    fillStyle?: string;
 }
 
-export type Shapes = "circle" | "rect" | "pencil"
+export type Shapes = "circle" | "rect" | "pencil" | "triangle"

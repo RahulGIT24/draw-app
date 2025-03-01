@@ -35,16 +35,13 @@ export class Game {
         this.selectedShape = shape
     }
 
-    clearCanvas() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.fillStyle = "rgba(0,0,0)";
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.existingShapes.forEach((shape) => {
-            if (shape.type === "rect") {
-                this.ctx.strokeStyle = "rgba(255,255,255)";
+    renderShapes(shape: Shape) {
+        this.ctx.strokeStyle = shape.strokeStyle ?? "rgba(255,255,255)";
+        switch (shape.type) {
+            case 'rect':
                 this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-            }
-            else if (shape.type === "circle") {
+                break;
+            case 'circle':
                 const centerX = shape.centerX
                 const centerY = shape.centerY
                 const radius = shape.radius
@@ -52,14 +49,25 @@ export class Game {
                 this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
                 this.ctx.stroke()
                 this.ctx.closePath();
-            }
-            else if(shape.type==="line"){
+                break;
+            case 'line':
                 this.ctx.beginPath()
                 this.ctx.moveTo(shape.startX, shape.startY);
                 this.ctx.lineTo(shape.endX, shape.endY);
                 this.ctx.stroke();
-            }
-        })
+                break;
+            case 'triangle':
+                break
+        }
+    }
+
+    clearCanvas() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillStyle = "rgba(0,0,0)";
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.existingShapes.forEach((shape) => (
+            this.renderShapes(shape)
+        ))
     }
 
     async init() {
@@ -67,10 +75,10 @@ export class Game {
         this.clearCanvas();
     }
 
-    destroy(){
-        this.canvas.removeEventListener("mousedown",this.mouseDown)
-        this.canvas.removeEventListener("mouseup",this.mouseUp)
-        this.canvas.removeEventListener("mousemove",this.mouseMove)
+    destroy() {
+        this.canvas.removeEventListener("mousedown", this.mouseDown)
+        this.canvas.removeEventListener("mouseup", this.mouseUp)
+        this.canvas.removeEventListener("mousemove", this.mouseMove)
     }
 
 
@@ -89,13 +97,13 @@ export class Game {
         }
     }
 
-    mouseDown = async(e: MouseEvent)=> {
+    mouseDown = async (e: MouseEvent) => {
         this.clicked = true;
         this.startX = e.clientX;
         this.startY = e.clientY;
     }
 
-    mouseUp = async(e: MouseEvent) => {
+    mouseUp = async (e: MouseEvent) => {
         this.clicked = false;
         let width = e.clientX - this.startX;
         let height = e.clientY - this.startY;
@@ -103,42 +111,21 @@ export class Game {
         let data: Shape | null = null
 
         if (this.selectedShape === 'rect') {
-            data = {
-                type: "rect",
-                x: this.startX,
-                y: this.startY,
-                width,
-                height,
-            };
+            data = { type: "rect", x: this.startX, y: this.startY, width, height };
         } else if (this.selectedShape === 'circle') {
-            data = {
-                type: "circle",
-                centerX: this.startX + width / 2,
-                centerY: this.startY + height / 2,
-                radius: Math.sqrt(width * width + height * height) / 2,
-            };
-        }else if (this.selectedShape==='pencil'){
-            data = {
-                type:"line",
-                startX:this.startX,
-                startY:this.startY,
-                endX:e.clientX,
-                endY:e.clientY,
-            }
+            data = { type: "circle", centerX: this.startX + width / 2, centerY: this.startY + height / 2, radius: Math.sqrt(width * width + height * height) / 2, };
+        } else if (this.selectedShape === 'pencil') {
+            data = { type: "line", startX: this.startX, startY: this.startY, endX: e.clientX, endY: e.clientY, }
         }
-
-        console.log(data);
-
-        if (!data) return; // Ensure no unexpected behavior
-        
+        if (!data) return;
         this.socket.send(JSON.stringify({
             type: "SHAPE",
             shape: data,
             roomId: this.roomId
         }));
-        
+
         this.existingShapes.push(data);
-        this.clearCanvas();
+        this.clearCanvas()
         await addShapeInDB(this.roomId, data);
     }
 
@@ -149,30 +136,30 @@ export class Game {
             this.clearCanvas()
             this.ctx.strokeStyle = "rgba(255,255,255)";
 
+            let previewShape: Shape | null = null;
+
             if (this.selectedShape == 'rect') {
-                this.ctx.strokeRect(this.startX, this.startY, width, height);
+                previewShape = { type: 'rect', x: this.startX, y: this.startY, width: width, height }
             }
             else if (this.selectedShape == 'circle') {
                 const centerX = this.startX + width / 2;
                 const centerY = this.startY + height / 2;
                 const radius = Math.sqrt(width * width + height * height) / 2;
-                this.ctx.beginPath()
-                this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-                this.ctx.stroke()
-                this.ctx.closePath();
+                previewShape = { type: 'circle', centerX, centerY, radius }
             }
-            else if(this.selectedShape=="pencil"){
-                this.ctx.beginPath()
-                this.ctx.moveTo(this.startX, this.startY);
-                this.ctx.lineTo(e.clientX, e.clientY);
-                this.ctx.stroke()
+            else if (this.selectedShape == "pencil") {
+                previewShape = { type: 'line', startX: this.startX, startY: this.startY, endX: e.clientX, endY: e.clientY }
+            } else if (this.selectedShape === 'triangle') {
+                
             }
+
+            if (previewShape) this.renderShapes(previewShape);
         }
     }
 
     initMouseEventHandlers() {
-        this.canvas.addEventListener("mousedown",this.mouseDown);
-        this.canvas.addEventListener("mousemove",this.mouseMove);
-        this.canvas.addEventListener("mouseup",this.mouseUp);
+        this.canvas.addEventListener("mousedown", this.mouseDown);
+        this.canvas.addEventListener("mousemove", this.mouseMove);
+        this.canvas.addEventListener("mouseup", this.mouseUp);
     }
 }

@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import { BackgroundLines } from "../components/ui/background-lines";
-import { HTTP_BACKEND } from "@repo/common/config";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -30,11 +29,7 @@ export default function MyRooms() {
 
     const getRooms = async () => {
         try {
-            const rooms = await axios.get(`${HTTP_BACKEND}/rooms`, {
-                headers: {
-                    authorization: localStorage.getItem("token")
-                }
-            })
+            const rooms = await axios.get(`/api/rooms`)
             setMyRooms(rooms.data.rooms);
         } catch (error) {
             toast.error("Error while fetching Rooms")

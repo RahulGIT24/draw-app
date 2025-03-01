@@ -4,12 +4,8 @@ import { Shape } from "../types/types"
 
 export async function getExistingShapes(roomId: string | string[]) {
     try {
-        const url = `${HTTP_BACKEND}/get-existing-shapes/${roomId}`
-        const res = await axios.get(url, {
-            headers: {
-                authorization: localStorage.getItem("token")
-            },
-        })
+        const url = `/api/get-existing-shapes/${roomId}`
+        const res = await axios.get(url)
         const shape = res.data.shapes.map((shape: any) => {
             if (shape.type == 'rect') {
                 return {
@@ -36,7 +32,7 @@ export async function getExistingShapes(roomId: string | string[]) {
 }
 
 export async function addShapeInDB(roomId: string | string[], shape: Shape) {
-    const url = `${HTTP_BACKEND}/add-shapes/${roomId}`
+    const url = `/api/add-shapes/${roomId}`
     let data:any;
     if (shape.type == 'rect') {
         data = {

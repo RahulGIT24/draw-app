@@ -28,6 +28,8 @@ model Room{
   admin User @relation(fields: [adminid], references: [id])
   Shapes Shape[]
   collaboration Boolean @default(false)
+  collaborationToken String @default("")
+  @@index([collaborationToken])
 }
 
 model Shape{
@@ -41,6 +43,7 @@ model Shape{
   fillStyle String
   roomId Int
   radius Float?
+  points Json?
   userId Int
   room Room @relation(fields: [roomId], references: [id])
   user User @relation(fields: [userId], references: [id])

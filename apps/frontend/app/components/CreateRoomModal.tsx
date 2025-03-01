@@ -18,10 +18,6 @@ export default function CreateRoomModal({ roomSlug, setRoomSlug, onSubmit, setCl
         "Looking for a BlackBoard",
     ], [])
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setRoomSlug(e.target.value)
-    };
-
     return <div className="h-screen flex flex-col justify-center fixed inset-0 bg-zinc-800 bg-opacity-85  items-center px-4 z-40 ">
         <h2 className="mb-10 sm:mb-20 text-xl text-center sm:text-5xl dark:text-white text-black">
             Enter Your Room Slug

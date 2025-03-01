@@ -7,10 +7,11 @@ import { CreateUserSchema, SignInSchema } from "@repo/common/zod"
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { HTTP_BACKEND } from "@repo/common/config";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
+    const [loading, setLoading] = useState(false);
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isSignIn) {
@@ -35,11 +36,11 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
 
         if (!result.success) {
             setError(result.error.errors[0].message);
+            return;
         }
-
-        // api call
+        setLoading(true);
         try {
-            const res = await axios.post(`${HTTP_BACKEND}/signup`, {
+            await axios.post(`/api/signup`, {
                 username: result.data?.username,
                 email: result.data?.email,
                 password: result.data?.password,
@@ -48,29 +49,37 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
             toast.success("Account Created")
             router.push("/signin")
         } catch (error: any) {
-            toast.error(error.response.data.message)
+            if (error?.response?.data?.message) {
+                toast.error(error.response.data.message)
+            }
+        } finally {
+            setLoading(false);
         }
     }
 
     const onSignIn = async () => {
         setError(null)
+        setLoading(true);
         const result = SignInSchema.safeParse({ identifier, password })
 
         if (!result.success) {
             setError(result.error.errors[0].message);
         }
 
-        // api call
-        try {
-            const res = await axios.post(`${HTTP_BACKEND}/signin`, {
-                identifier: result.data?.identifier,
-                password: result.data?.password,
-            })
-            localStorage.setItem("token", res.data.token);
-            router.push("/")
-        } catch (error: any) {
-            console.log(error);
-            // toast.error(error.response.data.message)
+        const res = await signIn('credentials', {
+            redirect: false,
+            identifier: result.data?.identifier,
+            password: result.data?.password
+        })
+
+        setLoading(false);
+
+        if (res?.error) {
+            toast.error('Invalid Credentials or Account not Verified')
+        }
+
+        if (res?.url) {
+            router.replace("/")
         }
     }
 
@@ -113,6 +122,7 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
                 <button
                     className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
                     type="submit"
+                    disabled={loading}
                 >
                     {
                         isSignIn ? "Sign In" : "Sign Up"

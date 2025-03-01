@@ -48,14 +48,14 @@ wss.on('connection', (ws, request) => {
 
     const queryParams = new URLSearchParams(url.split("?")[1]);
     const token = queryParams.get("token") as string;
-    const userId = checkUser(token)
-    if (!userId) {
-        ws.close();
-        return;
-    }
+    // const userId = checkUser(token)
+    // if (!userId) {
+    //     ws.close();
+    //     return;
+    // }
 
     users.push({
-        userId,
+        'userId':'1',
         rooms: [],
         ws
     })

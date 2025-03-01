@@ -6,12 +6,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export default function CollaborateModal({ isCollaborating, setIsCollaborating, roomId, setCollaborateModal }: { isCollaborating: boolean, setIsCollaborating: (b: boolean) => void, roomId: string, setCollaborateModal: (b: boolean) => void }) {
+export default function CollaborateModal({ isCollaborating, setIsCollaborating, roomId, setCollaborateModal,collaborationToken }: { isCollaborating: boolean, setIsCollaborating: (b: boolean) => void, roomId: string, setCollaborateModal: (b: boolean) => void,collaborationToken:string }) {
     const [link, setLink] = useState<string>("");
 
     useEffect(() => {
-        if (isCollaborating) {
-            setLink(`http://localhost:3000/canvas/${roomId}`)
+        if (isCollaborating && collaborationToken) {
+            setLink(`http://localhost:3000/canvas/${roomId}?token=${collaborationToken}`)
         }
     }, [])
 
@@ -22,18 +22,13 @@ export default function CollaborateModal({ isCollaborating, setIsCollaborating, 
             const data = {
                 collaboration: !isCollaborating
             }
-            const res = await axios.put(`${HTTP_BACKEND}/room/${roomId}`, data, {
-                headers: {
-                    "authorization": localStorage.getItem("token")
-                }
-            })
+            const res = await axios.put(`/api/room/${roomId}`, data)
             setIsCollaborating(!isCollaborating);
             if (data.collaboration === false) {
                 setLink("");
             }
-            // console.log(res);
             if (res.data.collaboration) {
-                setLink(`http://localhost:3000/canvas/${roomId}`)
+                setLink(`http://localhost:3000/canvas/${roomId}?token=${res.data.token}`)
             } else {
                 setLink("");
             }
@@ -62,7 +57,7 @@ export default function CollaborateModal({ isCollaborating, setIsCollaborating, 
             {
                 link &&
                 <>
-                    <p className="text-purple-700">{link}</p>
+                    <p className="text-purple-700">{link.slice(0, 40) + "...."}</p>
                     <Button text="Copy Link" onClick={copyLink} classname="bg-zinc-800 text-white border border-white hover:text-zinc-800 hover:bg-white hover:border-zinc-800" />
                 </>
             }

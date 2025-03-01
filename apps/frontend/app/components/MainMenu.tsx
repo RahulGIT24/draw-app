@@ -2,10 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { FocusCards } from "./ui/focus-cards";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CreateRoomModal from "./CreateRoomModal";
 import { toast } from "sonner";
-import { HTTP_BACKEND } from "@repo/common/config";
 import axios from "axios";
 import JoinRoomModal from "./JoinRoomModal";
 
@@ -50,23 +49,13 @@ export default function MainMenu() {
             const data = {
                 slug: roomSlug
             }
-            const res = await axios.post(`${HTTP_BACKEND}/room`, data, {
-                headers: {
-                    authorization: localStorage.getItem("token")
-                }
-            })
+            const res = await axios.post(`/api/room`, data)
             const id = res.data.room.id as number;
             router.push(`/canvas/${id}`)
             toast.success("Room Created")
         } catch (error: any) {
             if(error.response.data.message){
                 toast.error(error.response.data.message);
-            }
-            // not authorized
-            if (error.response.status === 403) {
-                localStorage.removeItem("token");
-                router.push("/signin")
-                toast.error('Session Expired')
             }
         }
     }
