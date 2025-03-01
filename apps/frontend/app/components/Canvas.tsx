@@ -1,20 +1,34 @@
 "use client"
-
 import { useEffect, useRef, useState } from "react"
-import IconButton from "./IconButton";
-import { Circle, Pencil, RectangleHorizontalIcon, Triangle, UsersRoundIcon } from "lucide-react"
 import { Game } from "../game/Game";
 import CollaborateModal from "./CollaborateModal";
+import { JOIN_ROOM, WS_URL } from "@repo/common/config";
+import { Tools } from "../types/types";
+import TopBar from "./TopBar";
 
-type Tools = "circle" | "rect" | "pencil" | 'triangle';
 
-export default function Canvas({ roomId, socket, isCollaborating, setIsCollaborating,isAdmin ,collaborationToken}: {
-    roomId: string, socket: WebSocket, isCollaborating: boolean,isAdmin:boolean,collaborationToken:string
-    setIsCollaborating: (b: boolean) => void
+export default function Canvas({ roomId, IsCollaborating, isAdmin, collaborationToken }: {
+    roomId: string, IsCollaborating: boolean, isAdmin: boolean, collaborationToken: string
 }) {
-    const [windowW, setWindowW] = useState(window.innerWidth)
-    const [windowH, setWindowH] = useState(window.innerHeight)
+    const [isCollaborating, setIsCollaborating] = useState(IsCollaborating)
+    const [windowW, setWindowW] = useState(0)
+    const [windowH, setWindowH] = useState(0)
     const [collaborateModal, setCollaborateModal] = useState(false);
+
+    const [socket, setSocket] = useState<null | WebSocket>(null)
+
+    const ws_url = `${WS_URL}`;
+
+    useEffect(() => {
+        const ws = new WebSocket(ws_url);
+        ws.onopen = () => {
+            setSocket(ws);
+            ws.send(JSON.stringify({
+                type: JOIN_ROOM,
+                roomId: roomId
+            }))
+        }
+    }, [])
 
     const [game, setGame] = useState<Game>()
 
@@ -29,62 +43,24 @@ export default function Canvas({ roomId, socket, isCollaborating, setIsCollabora
     }, [game, selectedTool])
 
     useEffect(() => {
-        if (canvasRef.current) {
+        setWindowH(window.innerHeight)
+        setWindowW(window.innerWidth)
+        if (canvasRef.current && socket) {
             const g = new Game(canvasRef.current, roomId, socket)
             setGame(g)
             return () => {
                 g.destroy()
             }
         }
-    }, [canvasRef])
+    }, [canvasRef, socket])
 
     return (
         <>
             {
-                collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken}/>
+                collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken} />
             }
             <canvas ref={canvasRef} width={windowW} height={windowH} />
-            <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} setCollaborateModal={setCollaborateModal} />
+            <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} func={() => setCollaborateModal(true)} />
         </>
     );
-}
-
-function TopBar({ selectedTool, setSelectedTool, inCollaboration, setCollaborateModal, isAdmin }: {
-    selectedTool: Tools,
-    setSelectedTool: (t: Tools) => void,
-    inCollaboration: boolean,
-    setCollaborateModal: (b: boolean) => void,
-    isAdmin: boolean
-}) {
-    return <div style={{
-        position: "fixed",
-        top: 10,
-        left: 10,
-        width: '100vw'
-    }}>
-        <div className="flex justify-between w-full px-6">
-            <div className="flex w-full">
-                <IconButton icon={<Pencil />} onClick={() => {
-                    setSelectedTool("pencil")
-                }} name="Line" activated={selectedTool === "pencil"} />
-                <IconButton icon={<RectangleHorizontalIcon />} onClick={() => {
-                    setSelectedTool("rect")
-                }} name="Rectangle" activated={selectedTool === "rect"} />
-                <IconButton icon={<Circle />} onClick={() => {
-                    setSelectedTool("circle")
-                }} name="Circle" activated={selectedTool === "circle"} />
-                <IconButton icon={<Triangle />} onClick={() => {
-                    setSelectedTool("triangle")
-                }} name="Circle" activated={selectedTool === "triangle"} />
-            </div>
-            {
-                isAdmin &&
-                <div>
-                    <IconButton icon={<UsersRoundIcon />} onClick={() => {
-                        setCollaborateModal(true)
-                    }} name="Circle" activated={inCollaboration} />
-                </div>
-            }
-        </div>
-    </div>
 }

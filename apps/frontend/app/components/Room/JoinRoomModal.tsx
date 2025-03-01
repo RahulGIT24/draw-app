@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react"
-import { PlaceholdersAndVanishInput } from "./ui/placeholders-and-vanish-input"
+import { PlaceholdersAndVanishInput } from "../ui/placeholders-and-vanish-input"
 import { CircleX } from "lucide-react";
 import { useRouter } from "next/navigation";
 

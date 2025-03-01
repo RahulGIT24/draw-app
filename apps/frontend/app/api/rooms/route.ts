@@ -5,7 +5,6 @@ import { getServerSession } from "next-auth";
 export async function GET(req:Request){
 
     const session = await getServerSession(authOptions);
-
     if(session==null){
         return Response.json({"message":"Unauthorized"},{status:401})
     }

@@ -33,3 +33,11 @@ export type Shape = {
 }
 
 export type Shapes = "circle" | "rect" | "pencil" | "triangle"
+
+export type Room = {
+    id: number,
+    slug: string,
+    createdAt: string
+}
+
+export type Tools = "circle" | "rect" | "pencil" | 'triangle';

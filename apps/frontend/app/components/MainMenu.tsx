@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import CreateRoomModal from "./CreateRoomModal";
 import { toast } from "sonner";
 import axios from "axios";
-import JoinRoomModal from "./JoinRoomModal";
+import JoinRoomModal from "./Room/JoinRoomModal";
 
 type Card = {
     title: string,

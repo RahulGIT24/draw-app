@@ -1,6 +1,4 @@
 "use client";
-
-import { HTTP_BACKEND } from "@repo/common/config";
 import { Button } from "@repo/ui/button";
 import axios from "axios";
 import { useEffect, useState } from "react";
