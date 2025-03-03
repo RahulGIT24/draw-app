@@ -11,8 +11,6 @@ export type Shape = {
     centerX: number,
     centerY: number,
     radius: number,
-    // startAngle: number,
-    // endAngle: number,
     strokeStyle?: string,
     fillStyle?: string
 }|{
@@ -20,9 +18,9 @@ export type Shape = {
     startX:number,
     startY:number,
     endX:number,
+    endY:number,
     strokeStyle?: string,
     fillStyle?: string,
-    endY:number
 }|{
     type:"triangle",
     point1: { x: number; y: number };
@@ -30,9 +28,17 @@ export type Shape = {
     point3: { x: number; y: number };
     strokeStyle?: string;
     fillStyle?: string;
+}|{
+    type:"text"
+    x:number
+    y:number
+    width:number
+    fillStyle?: string;
+    strokeStyle?: string;
+    text:string
 }
 
-export type Shapes = "circle" | "rect" | "pencil" | "triangle"
+export type Shapes = "circle" | "rect" | "pencil" | "triangle" | "text"
 
 export type Room = {
     id: number,
@@ -40,4 +46,4 @@ export type Room = {
     createdAt: string
 }
 
-export type Tools = "circle" | "rect" | "pencil" | 'triangle';
+export type Tools = Shapes;

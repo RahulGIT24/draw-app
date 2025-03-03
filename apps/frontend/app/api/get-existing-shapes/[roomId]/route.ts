@@ -9,7 +9,7 @@ export async function GET(req:Request,{params}:{params:{roomId:string}}){
     }
 
     const userId = session.user.id;
-    const roomId = params.roomId;
+    const roomId = (await params).roomId;
 
     try {
         const room = await client.room.findFirst({

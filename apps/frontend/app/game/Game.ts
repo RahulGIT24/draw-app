@@ -31,7 +31,6 @@ export class Game {
     }
 
     setShape(shape: Shapes) {
-        console.log("Shape Set")
         this.selectedShape = shape
     }
 
@@ -58,6 +57,11 @@ export class Game {
                 break;
             case 'triangle':
                 break
+            case 'text':
+                this.ctx.fillStyle = shape.fillStyle ?? 'white'
+                this.ctx.font = '22px sans-serif';
+                this.ctx.fillText(shape.text, shape.x, shape.y, shape.width)
+                break
         }
     }
 
@@ -65,6 +69,7 @@ export class Game {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = "rgba(0,0,0)";
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        if (!this.existingShapes) return;
         this.existingShapes.forEach((shape) => (
             this.renderShapes(shape)
         ))
@@ -88,9 +93,6 @@ export class Game {
             if (message.type === DRAW_SHAPE) {
                 const shape = message.shape;
 
-                if (!shape) return;
-                console.log(shape);
-
                 this.existingShapes.push(shape)
                 this.clearCanvas()
             }
@@ -101,6 +103,55 @@ export class Game {
         this.clicked = true;
         this.startX = e.clientX;
         this.startY = e.clientY;
+
+        if (this.selectedShape === 'text') {
+            this.addText(e.clientX, e.clientY);
+        }
+    }
+
+    addText(x: number, y: number) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.style.position = 'fixed';
+        input.style.background = 'transparent';
+        input.style.font = `22px sans-serif`
+        input.style.outline = 'none'
+        input.style.left = (x) + 'px';
+        input.style.top = `${y - 22 / 1.5}px`
+        input.style.color = 'white'
+
+        document.body.appendChild(input);
+        setTimeout(() => input.focus(), 0);
+
+        input.addEventListener('blur', () => {
+            const text = input.value;
+            if (text.trim() !== '') {
+                this.addTextToCanvas(text, x, y);
+                document.body.removeChild(input)
+            }
+        })
+    }
+
+    addTextToCanvas(text: string, x: number, y: number) {
+        const textShape: Shape = {
+            type: "text",
+            x,
+            y,
+            text,
+            width: 200,
+            fillStyle:"white"
+        };
+        this.existingShapes.push(textShape);
+        this.clearCanvas();
+
+        addShapeInDB(this.roomId, textShape);
+
+        this.socket.send(JSON.stringify({
+            type: "SHAPE",
+            shape: textShape,
+            roomId: this.roomId
+        }));
+
     }
 
     mouseUp = async (e: MouseEvent) => {
@@ -150,7 +201,7 @@ export class Game {
             else if (this.selectedShape == "pencil") {
                 previewShape = { type: 'line', startX: this.startX, startY: this.startY, endX: e.clientX, endY: e.clientY }
             } else if (this.selectedShape === 'triangle') {
-                
+
             }
 
             if (previewShape) this.renderShapes(previewShape);

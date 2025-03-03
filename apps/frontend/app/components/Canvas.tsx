@@ -59,7 +59,7 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
             {
                 collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken} />
             }
-            <canvas ref={canvasRef} width={windowW} height={windowH} />
+            <canvas ref={canvasRef} width={windowW} height={windowH} className={`${selectedTool === 'text' && 'cursor-text'}`} />
             <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} func={() => setCollaborateModal(true)} />
         </>
     );

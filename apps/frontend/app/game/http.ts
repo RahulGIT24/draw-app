@@ -1,4 +1,3 @@
-import { HTTP_BACKEND } from "@repo/common/config"
 import axios from "axios"
 import { Shape } from "../types/types"
 
@@ -21,6 +20,25 @@ export async function getExistingShapes(roomId: string | string[]) {
                     centerX: shape.x,
                     centerY: shape.y,
                     radius: shape.radius,
+                }
+            }
+            else if(shape.type==='line'){
+                return {
+                    type: shape.type,
+                    startX: shape.x,
+                    startY: shape.y,
+                    endX: shape.endX,
+                    endY: shape.endY,
+                    strokeStyle:shape.strokeStyle
+                }
+            }else if(shape.type==='text'){
+                return {
+                    type: shape.type,
+                    x: shape.x,
+                    text:shape.text,
+                    y: shape.y,
+                    width: shape.width,
+                    fillStyle:shape.fillStyle
                 }
             }
         })
@@ -48,14 +66,15 @@ export async function addShapeInDB(roomId: string | string[], shape: Shape) {
         data=shape;
         data.strokeStyle = "rgba(255,255,255)"
         data.fillStyle = "rgba(0,0,0)"
+    }else if(shape.type === 'text'){
+        data=shape;
+    }else if(shape.type==='line'){
+        data=shape
+        data.strokeStyle = "rgba(255,255,255)"
     }
 
     try {
-        const res = await axios.post(url, data, {
-            headers: {
-                authorization: localStorage.getItem("token")
-            },
-        })
+        const res = await axios.post(url, data)
         console.log(res)
     } catch (error) {
         console.log(error);

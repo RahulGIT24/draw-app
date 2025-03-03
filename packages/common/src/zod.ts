@@ -34,5 +34,21 @@ export const CreateShapeSchema = z.discriminatedUnion("type", [
     strokeStyle: z.string({ message: "Stroke style is required" }),
     fillStyle: z.string({ message: "Fill style is required" }),
   }),
+  z.object({
+    type: z.literal("line"),
+    startX: z.number({ message: "startX axis is required" }),
+    startY: z.number({ message: "startY axis is required" }),
+    endX: z.number({ message: "endX is required" }),
+    endY: z.number({ message: "endY is required" }),
+    strokeStyle: z.string({ message: "Stroke style is required" }),
+  }),
+  z.object({
+    type: z.literal("text"),
+    text: z.string({ message: "Text is required" }),
+    width: z.number({ message: "Width is required" }),
+    x: z.number({ message: "X is required" }),
+    y: z.number({ message: "Y is required" }),
+    fillStyle: z.string({ message: "Fill style is required" }),
+  }),
 ]);
 

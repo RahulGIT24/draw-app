@@ -39,12 +39,15 @@ model Shape{
   y Float?
   width Int?
   height Int?
-  strokeStyle String
-  fillStyle String
+  strokeStyle String?
+  fillStyle String?
   roomId Int
   radius Float?
   points Json?
   userId Int
+  text String?
+  endY Float?
+  endX Float?
   room Room @relation(fields: [roomId], references: [id])
   user User @relation(fields: [userId], references: [id])
 }
