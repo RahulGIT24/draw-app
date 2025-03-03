@@ -106,7 +106,7 @@ export async function PUT(req: Request, { params }: { params: { roomId: string }
             }
         })
 
-        return Response.json({ "message": `${collaboration ? "Collaboration Started" : "Collaboration Stopped"} `,collaboration }, { status: 200 })
+        return Response.json({ "message": `${collaboration ? "Collaboration Started" : "Collaboration Stopped"} `,token,collaboration }, { status: 200 })
     } catch (error) {
         return Response.json({ "message": "Internal Server Error" }, { status: 500   })
     }   
