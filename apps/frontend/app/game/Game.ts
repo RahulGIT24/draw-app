@@ -1,6 +1,6 @@
 import { addShapeInDB, getExistingShapes } from "./http"
 import { Shape, Shapes } from "../types/types"
-import { DRAW_SHAPE } from "@repo/common/config"
+import { DRAW_SHAPE, ERASE } from "@repo/common/config"
 
 export class Game {
 
@@ -96,6 +96,16 @@ export class Game {
                 this.existingShapes.push(shape)
                 this.clearCanvas()
             }
+            if (message.type === ERASE) {
+                console.log(message)
+                const shapeToRemove = JSON.stringify(message.shape);
+                const shapeIndex = this.existingShapes.findIndex(shape=>JSON.stringify(shape)==shapeToRemove)
+                if(shapeIndex && shapeIndex !==- 1){
+                    this.existingShapes.splice(shapeIndex,1)
+                }
+                this.clearCanvas()
+            }
+
         }
     }
 
@@ -106,6 +116,33 @@ export class Game {
 
         if (this.selectedShape === 'text') {
             this.addText(e.clientX, e.clientY);
+        }
+
+        // erase image when eraser is selected and clicked on image
+        if (this.selectedShape === 'eraser') {
+            const shapeIndex = this.existingShapes.findIndex(shape => this.isPointInShape(e.clientX, e.clientY, shape))
+
+            if (shapeIndex !== -1) {
+                const shapeToRemove = this.existingShapes[shapeIndex];
+                this.existingShapes.splice(shapeIndex, 1)
+                this.socket.send(JSON.stringify({
+                    type: "ERASE",
+                    shape: shapeToRemove,
+                    roomId: this.roomId
+                }))
+                this.clearCanvas()
+            }
+        }
+    }
+
+    isPointInShape(x: number, y: number, shape: Shape): boolean {
+        const type = shape.type;
+        switch (type) {
+            case 'rect':
+                return x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.width
+
+            default:
+                return false;
         }
     }
 
@@ -139,7 +176,7 @@ export class Game {
             y,
             text,
             width: 200,
-            fillStyle:"white"
+            fillStyle: "white"
         };
         this.existingShapes.push(textShape);
         this.clearCanvas();
@@ -200,8 +237,6 @@ export class Game {
             }
             else if (this.selectedShape == "pencil") {
                 previewShape = { type: 'line', startX: this.startX, startY: this.startY, endX: e.clientX, endY: e.clientY }
-            } else if (this.selectedShape === 'triangle') {
-
             }
 
             if (previewShape) this.renderShapes(previewShape);

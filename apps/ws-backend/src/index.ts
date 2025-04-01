@@ -1,6 +1,6 @@
 import { WebSocket, WebSocketServer } from "ws";
 import jwt from "jsonwebtoken"
-import { DRAW_SHAPE, JOIN_ROOM, LEAVE_ROOM, SHAPE } from "@repo/common/config"
+import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
 import { JWT_SEC } from "@repo/backend-common/config";
 
@@ -21,20 +21,20 @@ function checkUser(token: string): string | null {
         if (!token) {
             return null
         }
-    
+
         // validate the token by jwt.verify
         const decoded = jwt.verify(token, JWT_SEC)
-    
+
         if (typeof decoded == "string") {
             return null
         }
-    
+
         if (!decoded || !decoded.userId) {
             return null
         }
-    
+
         return decoded.userId
-        
+
     } catch (error) {
         return null
     }
@@ -55,28 +55,28 @@ wss.on('connection', (ws, request) => {
     // }
 
     users.push({
-        'userId':'1',
+        'userId': '1',
         rooms: [],
         ws
     })
 
-    ws.on('message', async (message:string) => {
+    ws.on('message', async (message: string) => {
 
         const data = JSON.parse(message);
 
         const type = data.type;
-        
-        if(type===SHAPE){
+
+        if (type === SHAPE) {
             const shape = data.shape;
             const roomId = data.roomId
 
             const roomUsers = users.filter(user => user.rooms.includes(roomId));
 
-            roomUsers.forEach(user=>{
-                if(user.ws !== ws && user.ws.readyState === WebSocket.OPEN){
+            roomUsers.forEach(user => {
+                if (user.ws !== ws && user.ws.readyState === WebSocket.OPEN) {
                     user.ws.send(JSON.stringify({
-                        type:DRAW_SHAPE,
-                        shape:shape
+                        type: DRAW_SHAPE,
+                        shape: shape
                     }))
                 }
             })
@@ -118,6 +118,47 @@ wss.on('connection', (ws, request) => {
             const user = users.find(x => x.ws === ws);
             if (!user) return;
             user.rooms = user?.rooms.filter(x => x == roomId);
+        }
+
+        if (type == ERASE) {
+            const roomId = data.roomId;
+            const shape = data.shape
+
+
+            if (!roomId) {
+                return;
+            }
+
+            const room = await client.room.findFirst({
+                where: {
+                    id: Number(roomId)
+                }
+            })
+
+
+            if (!room) {
+                return;
+            }
+
+            const roomUsers = users.filter(user => user.rooms.includes(roomId));
+            roomUsers.forEach(user => {
+                if (user.ws !== ws && user.ws.readyState === WebSocket.OPEN) {
+                    user.ws.send(JSON.stringify({
+                        type: ERASE,
+                        shape: shape
+                    }))
+                }
+            })
+
+            try {
+                await client.shape.delete({
+                    where: {
+                        id: shape.id
+                    }
+                })
+            } catch (error) {
+                return;
+            }
         }
 
     })

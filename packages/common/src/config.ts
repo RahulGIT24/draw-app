@@ -4,3 +4,4 @@ export const LEAVE_ROOM="leave_room"
 export const WS_URL = `ws://localhost:8000`
 export const SHAPE = "SHAPE"
 export const DRAW_SHAPE = "DRAW_SHAPE"
+export const ERASE = "ERASE"

@@ -6,7 +6,6 @@ import { JOIN_ROOM, WS_URL } from "@repo/common/config";
 import { Tools } from "../types/types";
 import TopBar from "./TopBar";
 
-
 export default function Canvas({ roomId, IsCollaborating, isAdmin, collaborationToken }: {
     roomId: string, IsCollaborating: boolean, isAdmin: boolean, collaborationToken: string
 }) {

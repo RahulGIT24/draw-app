@@ -8,6 +8,7 @@ export async function getExistingShapes(roomId: string | string[]) {
         const shape = res.data.shapes.map((shape: any) => {
             if (shape.type == 'rect') {
                 return {
+                    id:shape.id,
                     type: shape.type,
                     height: shape.height,
                     x: shape.x,
@@ -16,6 +17,7 @@ export async function getExistingShapes(roomId: string | string[]) {
                 }
             }else if(shape.type==='circle'){
                 return {
+                    id:shape.id,
                     type: shape.type,
                     centerX: shape.x,
                     centerY: shape.y,
@@ -24,6 +26,7 @@ export async function getExistingShapes(roomId: string | string[]) {
             }
             else if(shape.type==='line'){
                 return {
+                    id:shape.id,
                     type: shape.type,
                     startX: shape.x,
                     startY: shape.y,
@@ -33,6 +36,7 @@ export async function getExistingShapes(roomId: string | string[]) {
                 }
             }else if(shape.type==='text'){
                 return {
+                    id:shape.id,
                     type: shape.type,
                     x: shape.x,
                     text:shape.text,

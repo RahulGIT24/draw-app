@@ -1,4 +1,4 @@
-import {Circle, Pencil, RectangleHorizontalIcon, Triangle, Type, UsersRoundIcon } from "lucide-react"
+import {Circle, Eraser, Pencil, RectangleHorizontalIcon, Type, UsersRoundIcon } from "lucide-react"
 import { Tools } from "../types/types"
 import ToolsSelection from "./ToolsSelection"
 import IconButton from "./IconButton"
@@ -16,13 +16,13 @@ export default function TopBar({ selectedTool, setSelectedTool, inCollaboration,
         left: 10,
         width: '100vw'
     }}>
-        <div className={`flex justify-between w-full px-6 ${selectedTool==='text'&& 'cursor-text'}`}>
+        <div className={`flex justify-between w-full px-6 ${selectedTool === 'text' && 'cursor-text'} ${selectedTool==='eraser' && `cursor-[url('https://png.pngtree.com/png-vector/20240628/ourmid/pngtree-clipart-of-white-eraser-illustration-png-image_12902861.png'), auto]`}`}>
             <div className="flex w-full">
                 <ToolsSelection Tool={Pencil} func={() => { setSelectedTool('pencil') }} activated={selectedTool === 'pencil'} name="Line" />
                 <ToolsSelection Tool={RectangleHorizontalIcon} func={() => { setSelectedTool('rect') }} activated={selectedTool === "rect"} name="Rectangle" />
                 <ToolsSelection Tool={Circle} func={() => { setSelectedTool('circle') }} activated={selectedTool === "circle"} name="Circle" />
-                <ToolsSelection Tool={Triangle} func={() => { setSelectedTool('triangle') }} activated={selectedTool === "triangle"} name="Triangle" />
                 <ToolsSelection Tool={Type} func={() => { setSelectedTool('text') }} activated={selectedTool === "text"} name="Text" />
+                <ToolsSelection Tool={Eraser} func={() => { setSelectedTool('eraser') }} activated={selectedTool === "eraser"} name="Eraser" />
             </div>
             {
                 isAdmin &&

@@ -1,4 +1,5 @@
 export type Shape = {
+    id?:number 
     type: "rect",
     x: number,
     y: number,
@@ -7,6 +8,7 @@ export type Shape = {
     strokeStyle?: string,
     fillStyle?: string
 } | {
+    id?:number 
     type: "circle",
     centerX: number,
     centerY: number,
@@ -14,6 +16,7 @@ export type Shape = {
     strokeStyle?: string,
     fillStyle?: string
 }|{
+    id?:number 
     type:"line",
     startX:number,
     startY:number,
@@ -29,6 +32,7 @@ export type Shape = {
     strokeStyle?: string;
     fillStyle?: string;
 }|{
+    id?:number 
     type:"text"
     x:number
     y:number
@@ -38,7 +42,7 @@ export type Shape = {
     text:string
 }
 
-export type Shapes = "circle" | "rect" | "pencil" | "triangle" | "text"
+export type Shapes = "circle" | "rect" | "pencil" | "triangle" | "text" | "eraser"
 
 export type Room = {
     id: number,
