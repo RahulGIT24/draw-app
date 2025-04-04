@@ -97,11 +97,10 @@ export class Game {
                 this.clearCanvas()
             }
             if (message.type === ERASE) {
-                console.log(message)
                 const shapeToRemove = JSON.stringify(message.shape);
-                const shapeIndex = this.existingShapes.findIndex(shape=>JSON.stringify(shape)==shapeToRemove)
-                if(shapeIndex && shapeIndex !==- 1){
-                    this.existingShapes.splice(shapeIndex,1)
+                const shapeIndex = this.existingShapes.findIndex(shape => JSON.stringify(shape) == shapeToRemove)
+                if (shapeIndex && shapeIndex !== - 1) {
+                    this.existingShapes.splice(shapeIndex, 1)
                 }
                 this.clearCanvas()
             }
@@ -136,15 +135,63 @@ export class Game {
     }
 
     isPointInShape(x: number, y: number, shape: Shape): boolean {
-        const type = shape.type;
-        switch (type) {
+        const padding = 5;
+
+        switch (shape.type) {
             case 'rect':
-                return x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.width
+                const nearLeft = Math.abs(x - shape.x) <= padding && y >= shape.y - padding && y <= shape.y + shape.height + padding;
+                const nearRight = Math.abs(x - (shape.x + shape.width)) <= padding && y >= shape.y - padding && y <= shape.y + shape.height + padding;
+                const nearTop = Math.abs(y - shape.y) <= padding && x >= shape.x - padding && x <= shape.x + shape.width + padding;
+                const nearBottom = Math.abs(y - (shape.y + shape.height)) <= padding && x >= shape.x - padding && x <= shape.x + shape.width + padding;
+
+                return nearLeft || nearRight || nearTop || nearBottom;
+
+            case 'circle':
+                const distanceFromCenter = Math.sqrt((x - shape.centerX) ** 2 + (y - shape.centerY) ** 2);
+                return Math.abs(distanceFromCenter - shape.radius) <= padding;
+
+            case 'line':
+                return this.isPointNearLine(x, y, shape.startX, shape.startY, shape.endX, shape.endY);
+
+            case 'text':
+                return (
+                    x >= shape.x && x <= shape.x + shape.width &&
+                    y >= shape.y - 22 && y <= shape.y
+                );
 
             default:
                 return false;
         }
     }
+
+
+    isPointNearLine(x: number, y: number, x1: number, y1: number, x2: number, y2: number, tolerance = 5): boolean {
+        const A = x - x1;
+        const B = y - y1;
+        const C = x2 - x1;
+        const D = y2 - y1;
+    
+        const dot = A * C + B * D;
+        const lenSq = C * C + D * D;
+        const param = lenSq !== 0 ? dot / lenSq : -1;
+    
+        let xx, yy;
+        if (param < 0) {
+            xx = x1;
+            yy = y1;
+        } else if (param > 1) {
+            xx = x2;
+            yy = y2;
+        } else {
+            xx = x1 + param * C;
+            yy = y1 + param * D;
+        }
+    
+        const dx = x - xx;
+        const dy = y - yy;
+        return Math.sqrt(dx * dx + dy * dy) <= tolerance;
+    }
+    
 
     addText(x: number, y: number) {
         const input = document.createElement('input');
@@ -169,7 +216,8 @@ export class Game {
         })
     }
 
-    addTextToCanvas(text: string, x: number, y: number) {
+    // check
+    async addTextToCanvas(text: string, x: number, y: number) {
         const textShape: Shape = {
             type: "text",
             x,
@@ -181,7 +229,12 @@ export class Game {
         this.existingShapes.push(textShape);
         this.clearCanvas();
 
-        addShapeInDB(this.roomId, textShape);
+        const id = await addShapeInDB(this.roomId, textShape);
+        this.existingShapes.map((shape) => {
+            if (JSON.stringify(shape) === JSON.stringify(textShape)) {
+                shape.id = id
+            }
+        })
 
         this.socket.send(JSON.stringify({
             type: "SHAPE",

@@ -24,6 +24,10 @@ body{
   background-color: rgb(25, 25, 25);
 }
 
+#curs{
+  cursor: url("/public/eraser.png"), auto;
+}
+
 img{
   width: 30px;
   height: 30px;

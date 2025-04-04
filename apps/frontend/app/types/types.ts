@@ -25,6 +25,7 @@ export type Shape = {
     strokeStyle?: string,
     fillStyle?: string,
 }|{
+    id?:number 
     type:"triangle",
     point1: { x: number; y: number };
     point2: { x: number; y: number };
