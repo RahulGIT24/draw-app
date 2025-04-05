@@ -229,10 +229,10 @@ export class Game {
         this.existingShapes.push(textShape);
         this.clearCanvas();
 
-        const id = await addShapeInDB(this.roomId, textShape);
+        // const id = await addShapeInDB(this.roomId, textShape);
         this.existingShapes.map((shape) => {
             if (JSON.stringify(shape) === JSON.stringify(textShape)) {
-                shape.id = id
+                shape.id = 1
             }
         })
 
@@ -267,7 +267,7 @@ export class Game {
 
         this.existingShapes.push(data);
         this.clearCanvas()
-        await addShapeInDB(this.roomId, data);
+        // await addShapeInDB(this.roomId, data);
     }
 
     mouseMove = (e: MouseEvent) => {

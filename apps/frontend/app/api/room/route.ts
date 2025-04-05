@@ -1,4 +1,5 @@
 import { authOptions } from "@/app/lib/options";
+import redis from "@repo/cache/cache";
 import { CreateRoomSchema } from "@repo/common/zod";
 import { client } from "@repo/db/prisma";
 import { getServerSession } from "next-auth";
@@ -16,6 +17,9 @@ export async function POST(req: Request) {
     }
 
     const userId = session.user.id;
+    const key = `rooms-user-${userId}`
+
+    await redis.del(key)
     try {
 
         const room = await client.room.create({

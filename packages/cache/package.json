@@ -1,0 +1,22 @@
+{
+  "name": "@repo/cache",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build":"tsc -b",
+    "dev":"npm run build && node dist/index.js"
+  },
+  "exports":{
+    "./cache":"./src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*"
+  },
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "ioredis": "^5.6.0"
+  }
+}

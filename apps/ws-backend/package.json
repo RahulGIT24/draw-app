@@ -8,17 +8,22 @@
     "dev": "npm run build && node dist/index.js"
   },
   "dependencies": {
+    "@repo/backend-common": "workspace:*",
+    "@repo/cache": "workspace:*",
+    "@repo/common": "workspace:*",
+    "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/ws": "^8.5.14",
     "jsonwebtoken": "^9.0.2",
-    "ws": "^8.18.0",
-    "@repo/backend-common":"workspace:*",
-    "@repo/db":"workspace:*",
-    "@repo/common":"workspace:*"
+    "object-hash": "^3.0.0",
+    "ws": "^8.18.0"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "@types/object-hash": "^3.0.6"
+  }
 }

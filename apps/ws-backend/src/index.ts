@@ -3,6 +3,8 @@ import jwt from "jsonwebtoken"
 import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
 import { JWT_SEC } from "@repo/backend-common/config";
+import redis from "@repo/cache/cache"
+import hash from "object-hash";
 
 const PORT = 8000;
 
@@ -41,8 +43,6 @@ function checkUser(token: string): string | null {
 }
 
 wss.on('connection', (ws, request) => {
-    console.log("Client Connected");
-
     const url = request.url;
     if (!url) return;
 
@@ -53,12 +53,6 @@ wss.on('connection', (ws, request) => {
     //     ws.close();
     //     return;
     // }
-
-    users.push({
-        'userId': '1',
-        rooms: [],
-        ws
-    })
 
     ws.on('message', async (message: string) => {
 
@@ -71,6 +65,17 @@ wss.on('connection', (ws, request) => {
             const roomId = data.roomId
 
             const roomUsers = users.filter(user => user.rooms.includes(roomId));
+
+            const key = `room:${roomId}:shapes`;
+            const existingShapes = await redis.get(key);
+
+            if (existingShapes) {
+                const shapes = JSON.parse(existingShapes)
+                shapes.push(shape)
+                await redis.set(key, JSON.stringify(shapes), "EX", 300)
+            } else {
+                await redis.set(key, JSON.stringify(shape), "EX", 300)
+            }
 
             roomUsers.forEach(user => {
                 if (user.ws !== ws && user.ws.readyState === WebSocket.OPEN) {
@@ -150,15 +155,31 @@ wss.on('connection', (ws, request) => {
                 }
             })
 
-            try {
-                await client.shape.delete({
-                    where: {
-                        id: shape.id
+            const key = `room:${roomId}:shapes`
+            const existingShapes = await redis.get(key);
+
+            if (existingShapes) {
+                console.log(existingShapes)
+                console.log(shape)
+                const newShapes = JSON.parse(existingShapes).filter((s: any) => {
+                    if (shape.id && s.id) {
+                        return (s?.id !== shape?.id)
+                    } else {
+                        return (hash(s) !== hash(shape))
                     }
-                })
-            } catch (error) {
-                return;
+                });
+                await redis.set(key, JSON.stringify(newShapes), "EX", 300)
             }
+
+            // try {
+            //     await client.shape.delete({
+            //         where: {
+            //             id: shape.id
+            //         }
+            //     })
+            // } catch (error) {
+            //     return;
+            // }
         }
 
     })
