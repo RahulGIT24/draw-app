@@ -17,6 +17,7 @@
     "@types/ws": "^8.5.14",
     "jsonwebtoken": "^9.0.2",
     "object-hash": "^3.0.0",
+    "uuid": "^11.1.0",
     "ws": "^8.18.0"
   },
   "keywords": [],

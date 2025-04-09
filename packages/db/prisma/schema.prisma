@@ -33,7 +33,8 @@ model Room{
 }
 
 model Shape{
-  id Int @default(autoincrement()) @id
+  id String @id
+  isDeleted Boolean @default(false)
   type String
   x Float?
   y Float?

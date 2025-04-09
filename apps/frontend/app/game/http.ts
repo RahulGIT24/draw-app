@@ -19,8 +19,8 @@ export async function getExistingShapes(roomId: string | string[]) {
                 return {
                     id:shape.id,
                     type: shape.type,
-                    centerX: shape.x,
-                    centerY: shape.y,
+                    x: shape.x,
+                    y: shape.y,
                     radius: shape.radius,
                 }
             }
@@ -28,11 +28,11 @@ export async function getExistingShapes(roomId: string | string[]) {
                 return {
                     id:shape.id,
                     type: shape.type,
-                    startX: shape.x,
-                    startY: shape.y,
+                    x: shape.x,
+                    y: shape.y,
                     endX: shape.endX,
                     endY: shape.endY,
-                    strokeStyle:shape.strokeStyle
+                    fillStyle:shape.fillStyle,
                 }
             }else if(shape.type==='text'){
                 return {

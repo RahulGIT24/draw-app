@@ -1,4 +1,4 @@
-import { addShapeInDB, getExistingShapes } from "./http"
+import {  getExistingShapes } from "./http"
 import { Shape, Shapes } from "../types/types"
 import { DRAW_SHAPE, ERASE } from "@repo/common/config"
 
@@ -35,14 +35,16 @@ export class Game {
     }
 
     renderShapes(shape: Shape) {
+        // console.log(shape)
         this.ctx.strokeStyle = shape.strokeStyle ?? "rgba(255,255,255)";
         switch (shape.type) {
             case 'rect':
                 this.ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
                 break;
             case 'circle':
-                const centerX = shape.centerX
-                const centerY = shape.centerY
+                console.log(shape)
+                const centerX = shape.x
+                const centerY = shape.y
                 const radius = shape.radius
                 this.ctx.beginPath()
                 this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -51,7 +53,7 @@ export class Game {
                 break;
             case 'line':
                 this.ctx.beginPath()
-                this.ctx.moveTo(shape.startX, shape.startY);
+                this.ctx.moveTo(shape.x, shape.y);
                 this.ctx.lineTo(shape.endX, shape.endY);
                 this.ctx.stroke();
                 break;
@@ -147,11 +149,11 @@ export class Game {
                 return nearLeft || nearRight || nearTop || nearBottom;
 
             case 'circle':
-                const distanceFromCenter = Math.sqrt((x - shape.centerX) ** 2 + (y - shape.centerY) ** 2);
+                const distanceFromCenter = Math.sqrt((x - shape.x) ** 2 + (y - shape.y) ** 2);
                 return Math.abs(distanceFromCenter - shape.radius) <= padding;
 
             case 'line':
-                return this.isPointNearLine(x, y, shape.startX, shape.startY, shape.endX, shape.endY);
+                return this.isPointNearLine(x, y, shape.x, shape.y, shape.endX, shape.endY);
 
             case 'text':
                 return (
@@ -254,9 +256,9 @@ export class Game {
         if (this.selectedShape === 'rect') {
             data = { type: "rect", x: this.startX, y: this.startY, width, height };
         } else if (this.selectedShape === 'circle') {
-            data = { type: "circle", centerX: this.startX + width / 2, centerY: this.startY + height / 2, radius: Math.sqrt(width * width + height * height) / 2, };
+            data = { type: "circle", x: this.startX + width / 2, y: this.startY + height / 2, radius: Math.sqrt(width * width + height * height) / 2, };
         } else if (this.selectedShape === 'pencil') {
-            data = { type: "line", startX: this.startX, startY: this.startY, endX: e.clientX, endY: e.clientY, }
+            data = { type: "line", x: this.startX, y: this.startY, endX: e.clientX, endY: e.clientY, }
         }
         if (!data) return;
         this.socket.send(JSON.stringify({
@@ -286,10 +288,10 @@ export class Game {
                 const centerX = this.startX + width / 2;
                 const centerY = this.startY + height / 2;
                 const radius = Math.sqrt(width * width + height * height) / 2;
-                previewShape = { type: 'circle', centerX, centerY, radius }
+                previewShape = { type: 'circle', x:centerX, y:centerY, radius }
             }
             else if (this.selectedShape == "pencil") {
-                previewShape = { type: 'line', startX: this.startX, startY: this.startY, endX: e.clientX, endY: e.clientY }
+                previewShape = { type: 'line', x: this.startX, y: this.startY, endX: e.clientX, endY: e.clientY }
             }
 
             if (previewShape) this.renderShapes(previewShape);

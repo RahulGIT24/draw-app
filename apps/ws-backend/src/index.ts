@@ -5,6 +5,7 @@ import { client } from "@repo/db/prisma"
 import { JWT_SEC } from "@repo/backend-common/config";
 import redis from "@repo/cache/cache"
 import hash from "object-hash";
+import {v4 as uuid} from 'uuid'
 
 const PORT = 8000;
 
@@ -54,6 +55,12 @@ wss.on('connection', (ws, request) => {
     //     return;
     // }
 
+    users.push({
+        ws,
+        rooms: [],
+        userId:'8',
+    });
+
     ws.on('message', async (message: string) => {
 
         const data = JSON.parse(message);
@@ -61,16 +68,21 @@ wss.on('connection', (ws, request) => {
         const type = data.type;
 
         if (type === SHAPE) {
-            const shape = data.shape;
             const roomId = data.roomId
-
             const roomUsers = users.filter(user => user.rooms.includes(roomId));
+            const creator  = users.filter(user=>user.ws===ws)[0]
+
+            const shape = data.shape;
+            shape.id = uuid()
+            shape.userId = Number(creator?.userId)
+            shape.roomId = Number(roomId)
+
 
             const key = `room:${roomId}:shapes`;
             const existingShapes = await redis.get(key);
 
             if (existingShapes) {
-                const shapes = JSON.parse(existingShapes)
+                const shapes = JSON.parse(existingShapes) ?? []
                 shapes.push(shape)
                 await redis.set(key, JSON.stringify(shapes), "EX", 300)
             } else {

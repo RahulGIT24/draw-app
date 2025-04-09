@@ -1,0 +1,22 @@
+{
+  "name": "service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "npm run build && nodemon dist/index.js"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node-cron": "^3.0.11",
+    "@repo/cache":"workspace:*",
+    "@repo/db":"workspace:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "node-cron": "^3.0.3"
+  }
+}

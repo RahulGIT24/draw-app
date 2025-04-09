@@ -10,16 +10,16 @@ export type Shape = {
 } | {
     id?:number 
     type: "circle",
-    centerX: number,
-    centerY: number,
+    x: number,
+    y: number,
     radius: number,
     strokeStyle?: string,
     fillStyle?: string
 }|{
     id?:number 
     type:"line",
-    startX:number,
-    startY:number,
+    x:number,
+    y:number,
     endX:number,
     endY:number,
     strokeStyle?: string,
