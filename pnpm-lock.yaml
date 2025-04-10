@@ -106,6 +106,25 @@ importers:
         specifier: ^5
         version: 5.7.3
 
+  apps/service:
+    dependencies:
+      node-cron:
+        specifier: ^3.0.3
+        version: 3.0.3
+    devDependencies:
+      '@repo/cache':
+        specifier: workspace:*
+        version: link:../../packages/cache
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      '@types/node-cron':
+        specifier: ^3.0.11
+        version: 3.0.11
+
   apps/ws-backend:
     dependencies:
       '@repo/backend-common':
@@ -224,25 +243,6 @@ importers:
       typescript-eslint:
         specifier: ^8.23.0
         version: 8.23.0(eslint@9.20.0(jiti@1.21.7))(typescript@5.7.3)
-
-  packages/service:
-    dependencies:
-      node-cron:
-        specifier: ^3.0.3
-        version: 3.0.3
-    devDependencies:
-      '@repo/cache':
-        specifier: workspace:*
-        version: link:../cache
-      '@repo/db':
-        specifier: workspace:*
-        version: link:../db
-      '@repo/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@types/node-cron':
-        specifier: ^3.0.11
-        version: 3.0.11
 
   packages/typescript-config: {}
 

@@ -11,14 +11,14 @@ export async function GET(req: Request, { params }: { params: { roomId: string }
 
     const userId = session.user.id;
     const roomId = (await params).roomId;
+
     const key = `room:${roomId}:shapes`
+    const cachedShapes = await redis.hvals(key);
 
-    const cachedShapes = await redis.get(key);
-    if (cachedShapes) {
-        console.log('cache hit')
-        return Response.json({ "shapes": JSON.parse(cachedShapes) }, { status: 200 })
+    if (cachedShapes && cachedShapes.length > 0) {
+        const parsedShapes = cachedShapes.map(shape => JSON.parse(shape));
+        return Response.json({ shapes: parsedShapes }, { status: 200 });
     }
-
     try {
         const room = await client.room.findFirst({
             where: {
@@ -35,11 +35,26 @@ export async function GET(req: Request, { params }: { params: { roomId: string }
 
         const shapes = await client.shape.findMany({
             where: {
-                roomId: parseInt(roomId)
+                roomId: parseInt(roomId),
+                isDeleted:false
             }
         })
 
-        await redis.set(key, JSON.stringify(shapes), "EX", 300)
+        const key = `room:${roomId}:shapes`;
+
+        const shapeMap: Record<string, string> = {};
+
+        shapes.forEach(shape => {
+            if (shape.id) {
+                shapeMap[shape.id] = JSON.stringify(shape);
+            }
+        });
+
+        if (Object.keys(shapeMap).length > 0) {
+            await redis.hset(key, shapeMap);
+            await redis.expire(key, 300);
+        }
+
 
         return Response.json({ "shapes": shapes }, { status: 200 })
 

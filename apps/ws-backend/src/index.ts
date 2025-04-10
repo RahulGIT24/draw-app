@@ -5,7 +5,7 @@ import { client } from "@repo/db/prisma"
 import { JWT_SEC } from "@repo/backend-common/config";
 import redis from "@repo/cache/cache"
 import hash from "object-hash";
-import {v4 as uuid} from 'uuid'
+import { v4 as uuid } from 'uuid'
 
 const PORT = 8000;
 
@@ -58,7 +58,7 @@ wss.on('connection', (ws, request) => {
     users.push({
         ws,
         rooms: [],
-        userId:'8',
+        userId: '8',
     });
 
     ws.on('message', async (message: string) => {
@@ -70,7 +70,7 @@ wss.on('connection', (ws, request) => {
         if (type === SHAPE) {
             const roomId = data.roomId
             const roomUsers = users.filter(user => user.rooms.includes(roomId));
-            const creator  = users.filter(user=>user.ws===ws)[0]
+            const creator = users.filter(user => user.ws === ws)[0]
 
             const shape = data.shape;
             shape.id = uuid()
@@ -79,15 +79,10 @@ wss.on('connection', (ws, request) => {
 
 
             const key = `room:${roomId}:shapes`;
-            const existingShapes = await redis.get(key);
 
-            if (existingShapes) {
-                const shapes = JSON.parse(existingShapes) ?? []
-                shapes.push(shape)
-                await redis.set(key, JSON.stringify(shapes), "EX", 300)
-            } else {
-                await redis.set(key, JSON.stringify(shape), "EX", 300)
-            }
+            await redis.hset(key, {
+                [shape.id]: JSON.stringify({ ...shape, isDeleted: false })
+            });
 
             roomUsers.forEach(user => {
                 if (user.ws !== ws && user.ws.readyState === WebSocket.OPEN) {
@@ -167,21 +162,29 @@ wss.on('connection', (ws, request) => {
                 }
             })
 
-            const key = `room:${roomId}:shapes`
-            const existingShapes = await redis.get(key);
+            let shapeToDel:any = await redis.hget(`room:${roomId}:shapes`, shape.id);
 
-            if (existingShapes) {
-                console.log(existingShapes)
-                console.log(shape)
-                const newShapes = JSON.parse(existingShapes).filter((s: any) => {
-                    if (shape.id && s.id) {
-                        return (s?.id !== shape?.id)
-                    } else {
-                        return (hash(s) !== hash(shape))
-                    }
-                });
-                await redis.set(key, JSON.stringify(newShapes), "EX", 300)
+            if(shapeToDel){
+                shapeToDel = JSON.parse(shapeToDel);
+                shapeToDel.isDeleted = true;
+                await redis.hset(`room:${roomId}:shapes`, shape.id, JSON.stringify(shapeToDel));
+            }else{
+                return;
             }
+
+            // const key = `room:${roomId}:shapes`
+            // const existingShapes = await redis.get(key);
+
+            // if (existingShapes) {
+            //     const newShapes = JSON.parse(existingShapes).filter((s: any) => {
+            //         if (shape.id && s.id) {
+            //             return (s?.id !== shape?.id)
+            //         } else {
+            //             return (hash(s) !== hash(shape))
+            //         }
+            //     });
+            //     await redis.set(key, JSON.stringify(newShapes), "EX", 300)
+            // }
 
             // try {
             //     await client.shape.delete({
