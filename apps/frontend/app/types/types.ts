@@ -7,6 +7,7 @@ export type Shape = {
     height: number,
     strokeStyle?: string,
     fillStyle?: string
+    isDeleted?:boolean,
 } | {
     id?:number 
     type: "circle",
@@ -15,6 +16,7 @@ export type Shape = {
     radius: number,
     strokeStyle?: string,
     fillStyle?: string
+    isDeleted?:boolean,
 }|{
     id?:number 
     type:"line",
@@ -24,6 +26,7 @@ export type Shape = {
     endY:number,
     strokeStyle?: string,
     fillStyle?: string,
+    isDeleted?:boolean,
 }|{
     id?:number 
     type:"triangle",
@@ -32,6 +35,7 @@ export type Shape = {
     point3: { x: number; y: number };
     strokeStyle?: string;
     fillStyle?: string;
+    isDeleted?:boolean,
 }|{
     id?:number 
     type:"text"
@@ -41,6 +45,7 @@ export type Shape = {
     fillStyle?: string;
     strokeStyle?: string;
     text:string
+    isDeleted?:boolean,
 }
 
 export type Shapes = "circle" | "rect" | "pencil" | "triangle" | "text" | "eraser"

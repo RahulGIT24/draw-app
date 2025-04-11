@@ -18,6 +18,8 @@ model User{
   createdAt DateTime @default(now())
   room Room[]
   Shapes Shape[]
+  userToken String @default("")
+  @@index([userToken])
 }
 
 model Room{

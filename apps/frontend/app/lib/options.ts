@@ -3,6 +3,7 @@ import { SignInSchema } from "@repo/common/zod"
 import bcrypt from "bcrypt"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { AuthOptions } from "next-auth"
+import jwt from 'jsonwebtoken'
 
 export const authOptions:AuthOptions = {
     providers: [
@@ -41,13 +42,24 @@ export const authOptions:AuthOptions = {
                     }
 
                     const passwordCorrect = await bcrypt.compare(dataValid.data.password, checkUser.password);
+                    const token = jwt.sign(checkUser.email,String(process.env.NEXTAUTH_SECRET))
+
+                    await client.user.update({
+                        where:{
+                            id:checkUser.id
+                        },
+                        data:{
+                            userToken:token
+                        }
+                    })
 
                     if (passwordCorrect) {
                         const user = {
                             "name": checkUser.name,
                             "username": checkUser.username,
                             "email": checkUser.email,
-                            "id":checkUser.id
+                            "id":checkUser.id,
+                            "userToken":token
                         }
                         return user;
                     }else{
@@ -66,6 +78,7 @@ export const authOptions:AuthOptions = {
                 token.id = user.id,
                 token.email = user.email,
                 token.username = user.username
+                token.userToken = user.userToken;
             }
 
             return token
@@ -75,7 +88,9 @@ export const authOptions:AuthOptions = {
                 session.user.email = token.email
                 session.user.id = token.id
                 session.user.username = token.username
+                session.user.userToken = token.userToken;
             }
+            console.log(session)
             return session
         }
     },

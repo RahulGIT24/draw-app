@@ -1,10 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws";
-import jwt from "jsonwebtoken"
 import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
-import { JWT_SEC } from "@repo/backend-common/config";
 import redis from "@repo/cache/cache"
-import hash from "object-hash";
 import { v4 as uuid } from 'uuid'
 
 const PORT = 8000;
@@ -14,51 +11,46 @@ const wss = new WebSocketServer({ port: PORT });
 interface User {
     ws: WebSocket,
     rooms: string[],
-    userId: string
+    userId: number
 }
 
 const users: User[] = []
 
-function checkUser(token: string): string | null {
+async function checkUser(token: string): Promise<number | null> {
     try {
-        if (!token) {
-            return null
+        const user = await client.user.findFirst({
+            where:{
+                userToken:token
+            }
+        })
+
+        if(user){
+            return user.id
         }
 
-        // validate the token by jwt.verify
-        const decoded = jwt.verify(token, JWT_SEC)
-
-        if (typeof decoded == "string") {
-            return null
-        }
-
-        if (!decoded || !decoded.userId) {
-            return null
-        }
-
-        return decoded.userId
+        return null;
 
     } catch (error) {
         return null
     }
 }
 
-wss.on('connection', (ws, request) => {
+wss.on('connection', async (ws, request) => {
     const url = request.url;
     if (!url) return;
 
     const queryParams = new URLSearchParams(url.split("?")[1]);
     const token = queryParams.get("token") as string;
-    // const userId = checkUser(token)
-    // if (!userId) {
-    //     ws.close();
-    //     return;
-    // }
+    const userId = await checkUser(token)
+    if (!userId) {
+        ws.close();
+        return;
+    }
 
     users.push({
         ws,
         rooms: [],
-        userId: '8',
+        userId: userId,
     });
 
     ws.on('message', async (message: string) => {

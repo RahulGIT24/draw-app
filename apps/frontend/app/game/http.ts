@@ -13,7 +13,8 @@ export async function getExistingShapes(roomId: string | string[]) {
                     height: shape.height,
                     x: shape.x,
                     y: shape.y,
-                    width: shape.width
+                    width: shape.width,
+                    isDeleted:shape.isDeleted
                 }
             }else if(shape.type==='circle'){
                 return {
@@ -22,6 +23,7 @@ export async function getExistingShapes(roomId: string | string[]) {
                     x: shape.x,
                     y: shape.y,
                     radius: shape.radius,
+                    isDeleted:shape.isDeleted
                 }
             }
             else if(shape.type==='line'){
@@ -33,6 +35,7 @@ export async function getExistingShapes(roomId: string | string[]) {
                     endX: shape.endX,
                     endY: shape.endY,
                     fillStyle:shape.fillStyle,
+                    isDeleted:shape.isDeleted
                 }
             }else if(shape.type==='text'){
                 return {
@@ -42,7 +45,8 @@ export async function getExistingShapes(roomId: string | string[]) {
                     text:shape.text,
                     y: shape.y,
                     width: shape.width,
-                    fillStyle:shape.fillStyle
+                    fillStyle:shape.fillStyle,
+                    isDeleted:shape.isDeleted
                 }
             }
         })

@@ -2,6 +2,8 @@ import axios from "axios";
 import Canvas from "../Canvas";
 import RedirectionButton from "./RedirectionButton";
 import { headers } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../lib/options";
 
 const validateRoom = async ({ roomId, token }: { roomId: string; token?: string }) => {
     try {
@@ -18,7 +20,6 @@ const validateRoom = async ({ roomId, token }: { roomId: string; token?: string 
                 Cookie: cookie,
             },
         });
-        console.log(res.data);
         const isCollaboration = res.data.room.collaboration;
         const collaborationToken = res.data.room.collaborationToken;
         const valid = true;
@@ -31,9 +32,11 @@ const validateRoom = async ({ roomId, token }: { roomId: string; token?: string 
     }
 };
 
-export default async function RoomCanvas({roomId,token}:{roomId:string,token:string}) {
+export default async function RoomCanvas({ roomId, token }: { roomId: string, token: string }) {
 
     const res = await validateRoom({ roomId: roomId, token });
+    const session = await getServerSession(authOptions);
+    const userToken = session?.user.userToken;
 
     if (res == null || res.valid === false) {
         return (
@@ -45,9 +48,11 @@ export default async function RoomCanvas({roomId,token}:{roomId:string,token:str
     }
 
     return (
+        userToken &&
         <Canvas
             isAdmin={res.isAdmin}
             roomId={roomId}
+            userToken={userToken}
             IsCollaborating={res.isCollaboration}
             collaborationToken={res.collaborationToken}
         />

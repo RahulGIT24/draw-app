@@ -6,8 +6,8 @@ import { JOIN_ROOM, WS_URL } from "@repo/common/config";
 import { Tools } from "../types/types";
 import TopBar from "./TopBar";
 
-export default function Canvas({ roomId, IsCollaborating, isAdmin, collaborationToken }: {
-    roomId: string, IsCollaborating: boolean, isAdmin: boolean, collaborationToken: string
+export default function Canvas({ roomId, IsCollaborating, isAdmin, collaborationToken,userToken }: {
+    roomId: string, IsCollaborating: boolean, isAdmin: boolean, collaborationToken: string,userToken:string
 }) {
     const [isCollaborating, setIsCollaborating] = useState(IsCollaborating)
     const [windowW, setWindowW] = useState(0)
@@ -16,7 +16,7 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
 
     const [socket, setSocket] = useState<null | WebSocket>(null)
 
-    const ws_url = `${WS_URL}`;
+    const ws_url = `${WS_URL}?token=${userToken}`;
 
     useEffect(() => {
         const ws = new WebSocket(ws_url);
@@ -58,6 +58,7 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
             {
                 collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken} />
             }
+            {/* Window size should be controlled */}
             <canvas ref={canvasRef} width={windowW} height={windowH} className={`${selectedTool === 'text' && 'cursor-text'}`} />
             <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} func={() => setCollaborateModal(true)} />
         </>

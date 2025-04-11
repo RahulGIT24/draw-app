@@ -35,7 +35,7 @@ export class Game {
     }
 
     renderShapes(shape: Shape) {
-        // console.log(shape)
+        if(shape.isDeleted) return;
         this.ctx.strokeStyle = shape.strokeStyle ?? "rgba(255,255,255)";
         switch (shape.type) {
             case 'rect':
@@ -100,10 +100,10 @@ export class Game {
             }
             if (message.type === ERASE) {
                 const shapeToRemove = JSON.stringify(message.shape);
-                const shapeIndex = this.existingShapes.findIndex(shape => JSON.stringify(shape) == shapeToRemove)
-                if (shapeIndex && shapeIndex !== - 1) {
-                    this.existingShapes.splice(shapeIndex, 1)
-                }
+                console.log(shapeToRemove)
+                const shapeIndex = this.existingShapes.findIndex(shape => shape.id === JSON.parse(shapeToRemove).id)
+                console.log(this.existingShapes[shapeIndex])
+                this.existingShapes[shapeIndex].isDeleted = true;
                 this.clearCanvas()
             }
 
