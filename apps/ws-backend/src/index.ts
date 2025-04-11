@@ -163,30 +163,6 @@ wss.on('connection', async (ws, request) => {
             }else{
                 return;
             }
-
-            // const key = `room:${roomId}:shapes`
-            // const existingShapes = await redis.get(key);
-
-            // if (existingShapes) {
-            //     const newShapes = JSON.parse(existingShapes).filter((s: any) => {
-            //         if (shape.id && s.id) {
-            //             return (s?.id !== shape?.id)
-            //         } else {
-            //             return (hash(s) !== hash(shape))
-            //         }
-            //     });
-            //     await redis.set(key, JSON.stringify(newShapes), "EX", 300)
-            // }
-
-            // try {
-            //     await client.shape.delete({
-            //         where: {
-            //             id: shape.id
-            //         }
-            //     })
-            // } catch (error) {
-            //     return;
-            // }
         }
 
     })
