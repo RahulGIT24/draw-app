@@ -1,25 +1,25 @@
+import { Button } from "@repo/ui/button";
 import { BackgroundLines } from "./components/ui/background-lines";
-import MainMenu from "./components/MainMenu";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./lib/options";
-import Logout from "./components/Logout";
 
-export default async function Home() {
-    const session = await getServerSession(authOptions);
-
-    if (session === null) {
-        return <div className="text-white h-screen text-center">
-            <p>Unauthorized</p>
-        </div>
-    } else {
-        return (
-            <BackgroundLines className="flex justify-center flex-col items-center">
-                <div className="absolute top-10 right-12">
-                <Logout/>
+export default function Home() {
+    return (<>
+        <BackgroundLines className="flex text-white text-2xl justify-center flex-col items-center">
+            <div className="tab absolute top-0 bg-zinc-900 h-20 z-20 w-full flex justify-between items-center px-6 pt-6">
+                <div>
+                    {/* App Logo here */}
                 </div>
-                <p className="text-white text-7xl font-bold top-20 fixed ">User Space</p>
-                <MainMenu />
-            </BackgroundLines>
-        )
-    }
+                <div className="flex items-center  gap-x-5 pb-4">
+                    <Button text="Sign In" classname="bg-white text-zinc-800 py-[4px] px-3 text-lg" />
+                    <Button text="Join Now" classname="bg-zinc-800 border-transparent text-white py-[4px] px-3 text-lg" />
+                </div>
+            </div>
+            <div className="flex justify-center items-center flex-col gap-y-16">
+                <h1 className="z-10 text-6xl font-bold">Welcome to Draw App</h1>
+                <video width="1000" height="240" autoPlay className="z-40">
+                    <source src="/video.webm" type="video/webm" />
+                </video>
+            </div>
+
+        </BackgroundLines>
+    </>)
 }

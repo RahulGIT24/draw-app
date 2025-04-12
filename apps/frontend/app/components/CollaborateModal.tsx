@@ -1,10 +1,11 @@
 "use client";
+import { OFF_COLLABORATION } from "@repo/common/config";
 import { Button } from "@repo/ui/button";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export default function CollaborateModal({ isCollaborating, setIsCollaborating, roomId, setCollaborateModal,collaborationToken }: { isCollaborating: boolean, setIsCollaborating: (b: boolean) => void, roomId: string, setCollaborateModal: (b: boolean) => void,collaborationToken:string }) {
+export default function CollaborateModal({ isCollaborating, setIsCollaborating, roomId, setCollaborateModal,collaborationToken,socket }: { isCollaborating: boolean, setIsCollaborating: (b: boolean) => void, roomId: string, setCollaborateModal: (b: boolean) => void,collaborationToken:string ,socket:WebSocket|null}) {
     const [link, setLink] = useState<string>("");
 
     useEffect(() => {
@@ -28,6 +29,10 @@ export default function CollaborateModal({ isCollaborating, setIsCollaborating, 
             if (res.data.collaboration) {
                 setLink(`http://localhost:3000/canvas/${roomId}?token=${res.data.token}`)
             } else {
+                socket?.send(JSON.stringify({
+                    type:OFF_COLLABORATION,
+                    roomId
+                }))
                 setLink("");
             }
             toast.success(res.data.message)

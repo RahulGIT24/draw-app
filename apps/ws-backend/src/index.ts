@@ -1,5 +1,5 @@
 import { WebSocket, WebSocketServer } from "ws";
-import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE } from "@repo/common/config"
+import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE, FULL } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
 import redis from "@repo/cache/cache"
 import { v4 as uuid } from 'uuid'
@@ -19,12 +19,12 @@ const users: User[] = []
 async function checkUser(token: string): Promise<number | null> {
     try {
         const user = await client.user.findFirst({
-            where:{
-                userToken:token
+            where: {
+                userToken: token
             }
         })
 
-        if(user){
+        if (user) {
             return user.id
         }
 
@@ -61,14 +61,17 @@ wss.on('connection', async (ws, request) => {
 
         if (type === SHAPE) {
             const roomId = data.roomId
+            const creator = users.find(user => user.ws === ws)
+
+            if (!creator?.rooms.includes(roomId)) {
+                return;
+            }
             const roomUsers = users.filter(user => user.rooms.includes(roomId));
-            const creator = users.filter(user => user.ws === ws)[0]
 
             const shape = data.shape;
-            shape.id = uuid()
+            // shape.id = uuid()
             shape.userId = Number(creator?.userId)
             shape.roomId = Number(roomId)
-
 
             const key = `room:${roomId}:shapes`;
 
@@ -84,28 +87,38 @@ wss.on('connection', async (ws, request) => {
                     }))
                 }
             })
-
         }
 
         if (type === JOIN_ROOM) {
             const roomId = data.roomId;
-
             if (!roomId) {
                 return;
             }
 
-            // check for room in db
-            const room = await client.room.findFirst({
-                where: {
-                    id: Number(roomId)
-                }
-            })
-
-            if (!room) {
+            const roomUsers = users.filter(user => user.rooms.includes(roomId));
+            if (roomUsers.length >= 10) {
+                ws.send(JSON.stringify({ type: FULL, messae: `Room is Full` }))
+                return;
+            }
+            const user = users.find(x => x.ws === ws);
+            if (user?.rooms && user?.rooms?.length >= 10) {
+                ws.send(JSON.stringify({ type: FULL, messae: `You are already in 10 rooms` }))
                 return;
             }
 
-            const user = users.find(x => x.ws === ws);
+            if (roomUsers.length === 0) {
+                const room = await client.room.findFirst({
+                    where: {
+                        id: Number(roomId)
+                    }
+                })
+
+                if (!room) {
+                    return;
+                }
+            }
+
+
 
             if (!user) return;
 
@@ -126,25 +139,33 @@ wss.on('connection', async (ws, request) => {
 
         if (type == ERASE) {
             const roomId = data.roomId;
-            const shape = data.shape
 
+            const creator = users.find(user => user.ws === ws)
+
+            if (!creator?.rooms.includes(roomId)) {
+                return;
+            }
+
+            const shape = data.shape
 
             if (!roomId) {
                 return;
             }
 
-            const room = await client.room.findFirst({
-                where: {
-                    id: Number(roomId)
+            const roomUsers = users.filter(user => user.rooms.includes(roomId));
+
+            if (roomUsers.length === 0) {
+                const room = await client.room.findFirst({
+                    where: {
+                        id: Number(roomId)
+                    }
+                })
+
+                if (!room) {
+                    return;
                 }
-            })
-
-
-            if (!room) {
-                return;
             }
 
-            const roomUsers = users.filter(user => user.rooms.includes(roomId));
             roomUsers.forEach(user => {
                 if (user.ws !== ws && user.ws.readyState === WebSocket.OPEN) {
                     user.ws.send(JSON.stringify({
@@ -154,16 +175,22 @@ wss.on('connection', async (ws, request) => {
                 }
             })
 
-            let shapeToDel:any = await redis.hget(`room:${roomId}:shapes`, shape.id);
+            let shapeToDel: any = await redis.hget(`room:${roomId}:shapes`, shape.id);
 
-            if(shapeToDel){
+            if (shapeToDel) {
                 shapeToDel = JSON.parse(shapeToDel);
                 shapeToDel.isDeleted = true;
                 await redis.hset(`room:${roomId}:shapes`, shape.id, JSON.stringify(shapeToDel));
-            }else{
+            } else {
                 return;
             }
         }
 
     })
+    ws.on('close', () => {
+        const index = users.findIndex(user => user.ws === ws);
+        if (index !== -1) {
+            users.splice(index, 1); 
+        }
+    });
 })

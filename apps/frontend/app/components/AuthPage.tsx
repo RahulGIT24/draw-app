@@ -79,7 +79,7 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
         }
 
         if (res?.url) {
-            router.replace("/")
+            router.replace("/home")
         }
     }
 

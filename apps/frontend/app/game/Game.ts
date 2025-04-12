@@ -1,6 +1,8 @@
 import {  getExistingShapes } from "./http"
 import { Shape, Shapes } from "../types/types"
-import { DRAW_SHAPE, ERASE } from "@repo/common/config"
+import { DRAW_SHAPE, ERASE, FULL } from "@repo/common/config"
+import { toast } from "sonner"
+import {v4 as uuid} from 'uuid'
 
 export class Game {
 
@@ -94,19 +96,19 @@ export class Game {
             const message = JSON.parse(event.data);
             if (message.type === DRAW_SHAPE) {
                 const shape = message.shape;
-
                 this.existingShapes.push(shape)
                 this.clearCanvas()
             }
             if (message.type === ERASE) {
                 const shapeToRemove = JSON.stringify(message.shape);
-                console.log(shapeToRemove)
                 const shapeIndex = this.existingShapes.findIndex(shape => shape.id === JSON.parse(shapeToRemove).id)
-                console.log(this.existingShapes[shapeIndex])
                 this.existingShapes[shapeIndex].isDeleted = true;
                 this.clearCanvas()
             }
-
+            if(message.type===FULL){
+                toast.info(message.message);
+                return;
+            }
         }
     }
 
@@ -234,7 +236,7 @@ export class Game {
         // const id = await addShapeInDB(this.roomId, textShape);
         this.existingShapes.map((shape) => {
             if (JSON.stringify(shape) === JSON.stringify(textShape)) {
-                shape.id = 1
+                shape.id = uuid()
             }
         })
 
@@ -254,11 +256,11 @@ export class Game {
         let data: Shape | null = null
 
         if (this.selectedShape === 'rect') {
-            data = { type: "rect", x: this.startX, y: this.startY, width, height };
+            data = {id:uuid(), type: "rect", x: this.startX, y: this.startY, width, height };
         } else if (this.selectedShape === 'circle') {
-            data = { type: "circle", x: this.startX + width / 2, y: this.startY + height / 2, radius: Math.sqrt(width * width + height * height) / 2, };
+            data = {id:uuid(), type: "circle", x: this.startX + width / 2, y: this.startY + height / 2, radius: Math.sqrt(width * width + height * height) / 2, };
         } else if (this.selectedShape === 'pencil') {
-            data = { type: "line", x: this.startX, y: this.startY, endX: e.clientX, endY: e.clientY, }
+            data = {id:uuid(), type: "line", x: this.startX, y: this.startY, endX: e.clientX, endY: e.clientY, }
         }
         if (!data) return;
         this.socket.send(JSON.stringify({

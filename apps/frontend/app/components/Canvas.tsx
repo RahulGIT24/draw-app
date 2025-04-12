@@ -6,8 +6,8 @@ import { JOIN_ROOM, WS_URL } from "@repo/common/config";
 import { Tools } from "../types/types";
 import TopBar from "./TopBar";
 
-export default function Canvas({ roomId, IsCollaborating, isAdmin, collaborationToken,userToken }: {
-    roomId: string, IsCollaborating: boolean, isAdmin: boolean, collaborationToken: string,userToken:string
+export default function Canvas({ roomId, IsCollaborating, isAdmin, collaborationToken, userToken }: {
+    roomId: string, IsCollaborating: boolean, isAdmin: boolean, collaborationToken: string, userToken: string
 }) {
     const [isCollaborating, setIsCollaborating] = useState(IsCollaborating)
     const [windowW, setWindowW] = useState(0)
@@ -56,7 +56,7 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
     return (
         <>
             {
-                collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken} />
+                collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken} socket={socket} />
             }
             {/* Window size should be controlled */}
             <canvas ref={canvasRef} width={windowW} height={windowH} className={`${selectedTool === 'text' && 'cursor-text'}`} />

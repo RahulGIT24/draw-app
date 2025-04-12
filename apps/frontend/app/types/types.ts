@@ -1,5 +1,5 @@
 export type Shape = {
-    id?:number 
+    id?:string
     type: "rect",
     x: number,
     y: number,
@@ -9,7 +9,7 @@ export type Shape = {
     fillStyle?: string
     isDeleted?:boolean,
 } | {
-    id?:number 
+    id?:string
     type: "circle",
     x: number,
     y: number,
@@ -18,7 +18,7 @@ export type Shape = {
     fillStyle?: string
     isDeleted?:boolean,
 }|{
-    id?:number 
+    id?:string
     type:"line",
     x:number,
     y:number,
@@ -28,7 +28,7 @@ export type Shape = {
     fillStyle?: string,
     isDeleted?:boolean,
 }|{
-    id?:number 
+    id?:string
     type:"triangle",
     point1: { x: number; y: number };
     point2: { x: number; y: number };
@@ -37,7 +37,7 @@ export type Shape = {
     fillStyle?: string;
     isDeleted?:boolean,
 }|{
-    id?:number 
+    id?:string
     type:"text"
     x:number
     y:number
