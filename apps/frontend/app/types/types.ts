@@ -5,7 +5,7 @@ export type Shape = {
     y: number,
     width: number,
     height: number,
-    strokeStyle?: string,
+    strokeStyle: string,
     fillStyle?: string
     isDeleted?:boolean,
 } | {
@@ -14,7 +14,7 @@ export type Shape = {
     x: number,
     y: number,
     radius: number,
-    strokeStyle?: string,
+    strokeStyle: string,
     fillStyle?: string
     isDeleted?:boolean,
 }|{
@@ -24,7 +24,7 @@ export type Shape = {
     y:number,
     endX:number,
     endY:number,
-    strokeStyle?: string,
+    strokeStyle: string,
     fillStyle?: string,
     isDeleted?:boolean,
 }|{
@@ -33,7 +33,7 @@ export type Shape = {
     point1: { x: number; y: number };
     point2: { x: number; y: number };
     point3: { x: number; y: number };
-    strokeStyle?: string;
+    strokeStyle: string;
     fillStyle?: string;
     isDeleted?:boolean,
 }|{
@@ -42,8 +42,7 @@ export type Shape = {
     x:number
     y:number
     width:number
-    fillStyle?: string;
-    strokeStyle?: string;
+    fillStyle: string;
     text:string
     isDeleted?:boolean,
 }
@@ -57,3 +56,5 @@ export type Room = {
 }
 
 export type Tools = Shapes;
+
+export type COLOR = "red" | "blue" | "white" | "yellow" | "green"

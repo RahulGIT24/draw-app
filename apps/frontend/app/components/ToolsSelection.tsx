@@ -11,6 +11,6 @@ type PropT = {
 
 export default function ToolsSelection({ Tool, func, activated, name }: PropT) {
     return (
-        <IconButton icon={<Tool />} onClick={func} name={name} activated={activated} />
+        <IconButton icon={<Tool size={20}/>} onClick={func} name={name} activated={activated} />
     )
 }

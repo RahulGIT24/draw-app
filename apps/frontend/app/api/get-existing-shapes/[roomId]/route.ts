@@ -16,6 +16,7 @@ export async function GET(req: Request, { params }: { params: { roomId: string }
     const cachedShapes = await redis.hvals(key);
 
     if (cachedShapes && cachedShapes.length > 0) {
+
         const parsedShapes = cachedShapes.map(shape => JSON.parse(shape));
         return Response.json({ shapes: parsedShapes }, { status: 200 });
     }

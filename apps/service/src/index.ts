@@ -7,7 +7,7 @@ async function syncShapesToDB() {
         const keys = await redis.keys('room:*:shapes');
 
         let allShapes: any[] = [];
-        const deleteMap: Map<number, string[]> = new Map(); // roomId -> shapeIds to delete
+        const deleteMap: Map<number, string[]> = new Map();
 
         for (const key of keys) {
             const cachedShapes = await redis.hvals(key);
