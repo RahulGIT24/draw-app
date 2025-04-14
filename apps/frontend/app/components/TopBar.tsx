@@ -1,14 +1,16 @@
 import { Circle, Eraser, Pencil, RectangleHorizontalIcon, Type, UsersRoundIcon } from "lucide-react"
-import { Tools } from "../types/types"
+import { COLOR, Tools } from "../types/types"
 import ToolsSelection from "./ToolsSelection"
 import IconButton from "./IconButton"
+import ColorPallete from "./ColorPallete"
 
-export default function TopBar({ selectedTool, setSelectedTool, inCollaboration, isAdmin, func }: {
+export default function TopBar({ selectedTool, setSelectedTool, inCollaboration, isAdmin, func,setStrokeStyle }: {
     selectedTool: Tools,
     setSelectedTool: (t: Tools) => void,
     inCollaboration: boolean,
     isAdmin: boolean,
-    func: () => void
+    func: () => void,
+    setStrokeStyle:(color: COLOR) => void
 }) {
     return <div style={{
         position: "fixed",
@@ -35,15 +37,7 @@ export default function TopBar({ selectedTool, setSelectedTool, inCollaboration,
                 </div>
 
                 <div>
-                    <div title="Color" className="relative w-9 h-9 flex justify-center items-center border rounded-full bg-white">
-                        <div className="absolute top-10 grid grid-cols-2 grid-rows-2 w-[8rem] bg-black rounded-lg border py-4  gap-y-3 place-items-center">
-                            <div title="Blue" className="w-9 h-9 flex justify-center items-center border rounded-full bg-blue-800"></div>
-                            <div title="Yellow" className="w-9 h-9 flex justify-center items-center border rounded-full bg-yellow-500"></div>
-                            <div title="White" className="w-9 h-9 flex justify-center items-center border rounded-full bg-white"></div>
-                            <div title="Green" className="w-9 h-9 flex justify-center items-center border rounded-full bg-green-800"></div>
-                            <div title="Red" className="w-9 h-9 flex justify-center items-center border rounded-full bg-red-800"></div>
-                        </div>
-                    </div>
+                    <ColorPallete setStrokeStyle={setStrokeStyle}/>
                 </div>
             </div>
 

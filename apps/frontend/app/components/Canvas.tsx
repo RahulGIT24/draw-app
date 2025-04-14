@@ -55,21 +55,26 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
         }
     }, [canvasRef, socket])
 
-    useEffect(()=>{
-        if(game){
-            game.setScale(currentScale/100)
+    useEffect(() => {
+        if (game) {
+            game.setScale(currentScale / 100)
         }
-    },[currentScale])
+    }, [currentScale])
 
     return (
         <>
             {
-                collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken} socket={socket} />
+                game && collaborateModal && <CollaborateModal isCollaborating={isCollaborating} setIsCollaborating={setIsCollaborating} roomId={roomId} setCollaborateModal={setCollaborateModal} collaborationToken={collaborationToken} socket={socket} />
             }
             {/* Window size should be controlled */}
             <canvas ref={canvasRef} width={windowW} height={windowH} className={`${selectedTool === 'text' && 'cursor-text'}`} />
-            <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} func={() => setCollaborateModal(true)} />
-            <Footer currentScale={currentScale} setScale={setCurrentScale} />
+            {
+                game &&
+                <>
+                    <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} func={() => setCollaborateModal(true)} setStrokeStyle={game.setStrokeStyle}/>
+                    <Footer currentScale={currentScale} setScale={setCurrentScale} />
+                </>
+            }
         </>
     );
 }

@@ -17,7 +17,7 @@ export class Game {
     private startY: number
     socket: WebSocket
     private selectedShape: Shapes = "rect";
-    private strokeStyle: COLOR = "white"
+    public strokeStyle: COLOR = "#FFFFFF"
 
     constructor(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
         this.canvas = canvas
@@ -43,7 +43,7 @@ export class Game {
         this.selectedShape = shape
     }
 
-    public setStrokeStyle(color:COLOR){
+    public setStrokeStyle = (color: COLOR) => {
         this.strokeStyle = color;
     }
 
@@ -227,7 +227,7 @@ export class Game {
         input.style.outline = 'none'
         input.style.left = (x) + 'px';
         input.style.top = `${y - 22 / 1.5}px`
-        input.style.color = 'white'
+        input.style.color = this.strokeStyle
 
         document.body.appendChild(input);
         setTimeout(() => input.focus(), 0);
