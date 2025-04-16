@@ -7,3 +7,5 @@ export const DRAW_SHAPE = "DRAW_SHAPE"
 export const ERASE = "ERASE"
 export const OFF_COLLABORATION = "OFF_COLLABORATION"
 export const FULL = "FULL"
+export const SIGNUP = 'SIGNUP'
+export const EMAIL_QUEUE = 'email_queue'

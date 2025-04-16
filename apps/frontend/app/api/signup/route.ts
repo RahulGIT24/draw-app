@@ -1,6 +1,9 @@
+import { pushToEmailQueue } from "@repo/email-service/email";
+import { SIGNUP } from "@repo/common/config";
 import { CreateUserSchema } from "@repo/common/zod";
 import { client } from "@repo/db/prisma";
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 export async function POST(req:Request){
     try {
@@ -36,24 +39,23 @@ export async function POST(req:Request){
 
         dataValid.data.password = hashedPassword;
 
+        const token = jwt.sign({ email: dataValid.data.email,name:dataValid.data.name }, 'rahul', { expiresIn: '30d' })
         // put it in db
         const user = await client.user.create({
-            data: dataValid.data
+            data: {...dataValid.data,verificationToken:token}
         })
 
         if (user) {
+            await pushToEmailQueue({subject:SIGNUP,token})
             return Response.json({
-                "message":"Created",
-                "data":{
-                    "name":user.name,
-                    "email":user.email,
-                    "username":user.username
-                }
+                "message":"Verfication Email Send. Please Verify Account",
             },{status:201})
         }
 
-
     } catch (error) {
-        
+        console.log(error)
+        return Response.json({
+            "message":"Can't Send Verfication Email"
+        },{status:500})
     }
 }

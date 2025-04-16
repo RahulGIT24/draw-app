@@ -40,13 +40,13 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
         }
         setLoading(true);
         try {
-            await axios.post(`/api/signup`, {
+            const res = await axios.post(`/api/signup`, {
                 username: result.data?.username,
                 email: result.data?.email,
                 password: result.data?.password,
                 name: result.data?.name
             })
-            toast.success("Account Created")
+            toast.success(res.data.message)
             router.push("/signin")
         } catch (error: any) {
             if (error?.response?.data?.message) {
@@ -64,6 +64,7 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
 
         if (!result.success) {
             setError(result.error.errors[0].message);
+            return;
         }
 
         const res = await signIn('credentials', {
@@ -75,7 +76,8 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
         setLoading(false);
 
         if (res?.error) {
-            toast.error('Invalid Credentials or Account not Verified')
+            toast.error(res?.error)
+            return;
         }
 
         if (res?.url) {

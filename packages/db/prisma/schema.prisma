@@ -16,9 +16,11 @@ model User{
   photo String? @default("")
   name String
   createdAt DateTime @default(now())
+  verified Boolean @default(false)
   room Room[]
   Shapes Shape[]
   userToken String @default("")
+  verificationToken String @default("")
   @@index([userToken])
 }
 

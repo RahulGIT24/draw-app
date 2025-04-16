@@ -4,6 +4,8 @@ import bcrypt from "bcrypt"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { AuthOptions } from "next-auth"
 import jwt from 'jsonwebtoken'
+import { pushToEmailQueue } from "@repo/email-service/email"
+import { SIGNUP } from "@repo/common/config"
 
 export const authOptions:AuthOptions = {
     providers: [
@@ -33,7 +35,8 @@ export const authOptions:AuthOptions = {
                             password: true,
                             name: true,
                             username: true,
-                            email: true
+                            email: true,
+                            verified:true
                         }
                     })
 
@@ -41,8 +44,23 @@ export const authOptions:AuthOptions = {
                         throw new Error("User not exist")
                     }
 
-                    const passwordCorrect = await bcrypt.compare(dataValid.data.password, checkUser.password);
+                    
+                    if(!checkUser.verified){
+                        const token =  jwt.sign({email:checkUser.email,name:checkUser.name},'rahul',{expiresIn:'30d'})
+                        await pushToEmailQueue({subject:SIGNUP,token})
+                        await client.user.update({
+                            where:{
+                                email:checkUser.email
+                            },
+                            data:{
+                                verificationToken:token
+                            }
+                        })
+                        throw new Error("Account Not Verified. Verification Email Sent")
+                    }
+                    
                     const token = jwt.sign(checkUser.email,String(process.env.NEXTAUTH_SECRET))
+                    const passwordCorrect = await bcrypt.compare(dataValid.data.password, checkUser.password);
 
                     await client.user.update({
                         where:{

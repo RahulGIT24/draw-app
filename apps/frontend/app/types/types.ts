@@ -65,3 +65,8 @@ export interface IAvailableColors {
 }
 
 export interface IColorMap { title: string, color: COLOR, setColor: (color: COLOR) => void,setState:React.Dispatch<React.SetStateAction<COLOR>>,setOpen:(arg:boolean)=>void }
+
+export interface IEmail {
+    subject:'SIGNUP',
+    to:string
+}
