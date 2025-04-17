@@ -8,4 +8,7 @@ export const ERASE = "ERASE"
 export const OFF_COLLABORATION = "OFF_COLLABORATION"
 export const FULL = "FULL"
 export const SIGNUP = 'SIGNUP'
+export const FORGOTPASSWORD = 'FORGOTPASSWORD'
+export const SIGNIN = 'SIGNIN'
+export const RESETPASSWORD = 'RESETPASSWORD'
 export const EMAIL_QUEUE = 'email_queue'

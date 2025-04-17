@@ -70,3 +70,5 @@ export interface IEmail {
     subject:'SIGNUP',
     to:string
 }
+
+export type Page = 'SIGNIN' | 'SIGNUP' | 'FORGOTPASSWORD' | 'RESETPASSWORD'

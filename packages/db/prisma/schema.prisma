@@ -21,7 +21,9 @@ model User{
   Shapes Shape[]
   userToken String @default("")
   verificationToken String @default("")
-  @@index([userToken])
+  forgotPasswordToken String? @default("")
+  forgotPasswordTokenExpiry  DateTime? 
+  @@index([email,username])
 }
 
 model Room{

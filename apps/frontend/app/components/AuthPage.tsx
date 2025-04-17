@@ -9,15 +9,22 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { Page } from "../types/types";
+import { FORGOTPASSWORD, RESETPASSWORD, SIGNIN, SIGNUP } from "@repo/common/config";
 
-export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
+export function AuthPage({ isSignIn,token }: { isSignIn: Page,token?:string }) {
     const [loading, setLoading] = useState(false);
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (isSignIn) {
+        if (isSignIn === SIGNIN) {
             onSignIn();
-        } else {
+        } else if(isSignIn===SIGNUP) {
             onSignUp();
+        }else if(isSignIn===FORGOTPASSWORD){
+            onForgotPassword();
+        }
+        else if(isSignIn===RESETPASSWORD){
+            onResetPassword();
         }
     };
 
@@ -26,6 +33,7 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
     const [password, setPassword] = useState("")
     const [username, setUsername] = useState("")
     const [identifier, setIdentifier] = useState("")
+    const [confirmPassword,setConfirmPassword] = useState("")
     const [error, setError] = useState<string | null>(null)
 
     const router = useRouter();
@@ -85,16 +93,44 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
         }
     }
 
+    const onForgotPassword = async()=>{
+        try {
+            const res = await axios.post('/api/forgot-password',{identifier})
+            toast.success(res.data.message);
+        } catch (error:any) {
+            if (error?.response?.data?.message) {
+                toast.error(error.response.data.message)
+            }
+        }
+    }
+
+    const onResetPassword = async()=>{
+        if(!password || !confirmPassword) return;
+        if(password!==confirmPassword){
+            toast.error("Passwords don't match")
+        }
+        try {
+            const res = await axios.post('/api/reset-password',{password:password,token})
+            toast.success(res.data.message);
+            router.push("/signin")
+        } catch (error:any) {
+            if (error?.response?.data?.message) {
+                toast.error(error.response.data.message)
+            }
+        }
+    }
+
     return (
         <div className="max-w-md w-full mx-auto rounded-none md:rounded-2xl p-4 md:p-8 shadow-input bg-white dark:bg-black z-20">
             <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-                {isSignIn ? "Signin To Draw" : "Signup to Draw"}
+                {isSignIn === SIGNIN && "Signin To Draw"}
+                {isSignIn === SIGNUP && "Signup to Draw"}
+                {isSignIn === FORGOTPASSWORD && "Recover Your Account"}
             </h2>
 
             <form className="my-8" onSubmit={handleSubmit}>
-
-                {
-                    isSignIn ? <>
+                {isSignIn === SIGNIN && (
+                    <>
                         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
                             <LabelInputContainer>
                                 <Label htmlFor="identifier">Enter username or email</Label>
@@ -102,43 +138,92 @@ export function AuthPage({ isSignIn }: { isSignIn: boolean }) {
                             </LabelInputContainer>
                         </div>
                         <PasswordBox password={password} setPassword={setPassword} />
-                    </> : <>
-                        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-                            <LabelInputContainer>
-                                <Label htmlFor="name">Name</Label>
-                                <Input id="name" placeholder="Rahul" type="text" value={name} onChange={(e) => { setName(e.target.value) }} />
-                            </LabelInputContainer>
-                        </div>
-                        <LabelInputContainer className="mb-4">
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" placeholder="rahul@gmail.com" type="email" value={email} onChange={(e) => { setEmail(e.target.value) }} />
-                        </LabelInputContainer>
-                        <LabelInputContainer className="mb-4">
-                            <Label htmlFor="password">Username</Label>
-                            <Input id="password" placeholder="@username" type="text" value={username} onChange={(e) => { setUsername(e.target.value) }} />
-                        </LabelInputContainer>
-                        <PasswordBox password={password} setPassword={setPassword} />
                     </>
+                )}
+                {
+                    isSignIn === SIGNUP && (
+                        <>
+                            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+                                <LabelInputContainer>
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input id="name" placeholder="Rahul" type="text" value={name} onChange={(e) => { setName(e.target.value) }} />
+                                </LabelInputContainer>
+                            </div>
+                            <LabelInputContainer className="mb-4">
+                                <Label htmlFor="email">Email Address</Label>
+                                <Input id="email" placeholder="rahul@gmail.com" type="email" value={email} onChange={(e) => { setEmail(e.target.value) }} />
+                            </LabelInputContainer>
+                            <LabelInputContainer className="mb-4">
+                                <Label htmlFor="password">Username</Label>
+                                <Input id="password" placeholder="@username" type="text" value={username} onChange={(e) => { setUsername(e.target.value) }} />
+                            </LabelInputContainer>
+                            <PasswordBox password={password} setPassword={setPassword} />
+                        </>
+
+                    )
                 }
+                {
+                    isSignIn === FORGOTPASSWORD && (
+                        <>
+                            <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
+                                <LabelInputContainer>
+                                    <Label htmlFor="identifier">Enter username or email</Label>
+                                    <Input id="identifier" placeholder="@" type="text" value={identifier} onChange={(e) => { setIdentifier(e.target.value) }} />
+                                </LabelInputContainer>
+                            </div>
+                        </>
+
+                    )
+                }
+                {
+                    isSignIn === RESETPASSWORD && (
+                        <>
+                            <PasswordBox password={password} setPassword={setPassword}/>
+                            <CPasswordBox password={confirmPassword} setPassword={setConfirmPassword}/>
+                        </>
+
+                    )
+                }
+
 
                 <button
                     className="bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 w-full text-white rounded-md h-10 font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]"
                     type="submit"
                     disabled={loading}
                 >
-                    {
-                        isSignIn ? "Sign In" : "Sign Up"
-                    }
+                    {isSignIn === SIGNIN && "Sign In"}
+                    {isSignIn === SIGNUP && "Sign Up"}
+                    {isSignIn === FORGOTPASSWORD && "Send Recovery Mail"}
+                    {isSignIn === RESETPASSWORD && "Reset Password"}
                     <BottomGradient />
                 </button>
                 {
                     error && <p className="text-red-500 text-left mt-9"> {error} </p>
                 }
             </form>
-            <div className="flex justify-center items-center">
-                <Link href={"/signin"} className="text-blue-600 font-bold mt-3 text-center">{!isSignIn ? "Already Have an account?" : "New to Draw App"}</Link>
+            <div className="flex justify-center items-center flex-col gap-y-8">
+                {
+                    isSignIn === SIGNIN &&
+                    <>
+                        <Link href={"/signup"} className="text-blue-600 font-bold mt-3 text-center">New to Draw App?</Link>
+                        <Link href={"/forgot-password"} className="text-white font-bold mt-3 text-center">Forgot Password</Link>
+                    </>
+                }
+                {
+                    isSignIn === SIGNUP &&
+
+                    <Link href={"/signin"} className="text-blue-600 font-bold mt-3 text-center">Already have an account</Link>
+
+                }
+                {
+                    isSignIn === FORGOTPASSWORD &&
+
+                    <Link href={"/signin"} className="text-blue-600 font-bold mt-3 text-center">Sign In Instead</Link>
+
+                }
+
             </div>
-        </div>
+        </div >
     );
 }
 
@@ -169,6 +254,13 @@ const LabelInputContainer = ({
 const PasswordBox = ({ password, setPassword }: { password: string, setPassword: any }) => {
     return <LabelInputContainer className="mb-4">
         <Label htmlFor="password">Password</Label>
+        <Input id="password" placeholder="••••••••" type="password" value={password} onChange={(e) => { setPassword(e.target.value) }} />
+    </LabelInputContainer>
+}
+
+const CPasswordBox = ({ password, setPassword }: { password: string, setPassword: any }) => {
+    return <LabelInputContainer className="mb-4">
+        <Label htmlFor="password">Confirm Password</Label>
         <Input id="password" placeholder="••••••••" type="password" value={password} onChange={(e) => { setPassword(e.target.value) }} />
     </LabelInputContainer>
 }

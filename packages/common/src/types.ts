@@ -1,5 +1,5 @@
 export interface IEmail {
-    subject:'SIGNUP',
+    subject:'SIGNUP' | 'FORGOTPASSWORD',
     token:string,
 }
 
