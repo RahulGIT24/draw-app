@@ -143,6 +143,22 @@ importers:
         specifier: ^5
         version: 5.7.3
 
+  apps/general-services:
+    dependencies:
+      node-cron:
+        specifier: ^3.0.3
+        version: 3.0.3
+    devDependencies:
+      '@repo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      '@types/node-cron':
+        specifier: ^3.0.11
+        version: 3.0.11
+
   apps/shape-service:
     dependencies:
       node-cron:
