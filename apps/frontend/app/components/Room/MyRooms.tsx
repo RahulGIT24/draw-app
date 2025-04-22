@@ -1,28 +1,52 @@
-import { Room } from "@/app/types/types";
-import Image from "next/image";
-import RedirectionButton from "./RedirectionButton";
+import { ExpandableCard } from '../ui/ExpandableCard';
+import { client } from '@repo/db/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/lib/options'
 
-interface PropT {
-    rooms: Room[]
+export async function fetchRooms(page: number) {
+    try {
+        const session = await getServerSession(authOptions);
+        const rooms = await client.room.findMany({
+            where: {
+                adminid: Number(session?.user.id)
+            },
+            select: {
+                id: true,
+                slug: true,
+                createdAt: true
+            },
+            orderBy: {
+                createdAt: 'desc'
+            },
+            skip: (page - 1) * 5,
+            take: 5
+        });
+        const roomCount = await client.room.count({
+            where: {
+                adminid: Number(session?.user.id)
+            },
+        });
+        return { rooms, roomCount };
+    } catch (error) {
+        console.log(error)
+        return null
+    }
 }
 
-const returnLocalString = (d: string) => {
-    const date = new Date(d);
-    return date.toLocaleString();
-}
-
-export default function MyRooms({ rooms }: PropT) {
+export default async function MyRooms({ page }: { page: number }) {
+    const data = await fetchRooms(page);
     return (
-        rooms && rooms.length > 0 && rooms.map((r: Room) => (
-            <div className="mt-9 bg-zinc-700 p-9 z-20" key={r.id}>
-                <Image src="/thumbnail.jpg" alt="thumbnail" className="w-[35vw] h-[30vh]" width={1000} height={1000} />
-                <div className="my-4 font-semibold text-2xl">
-                    <p className="my-3">Room ID - {r.id}</p>
-                    <p className="my-3">Room Slug - {r.slug}</p>
-                    <p className="my-3">Creation Time - {returnLocalString(r.createdAt)}</p>
+        <div className='z-50 relative h-full'>
+            {
+                data && data.rooms.length > 0 &&
+                <div key={data.roomCount}>
+                    <ExpandableCard cards={data.rooms} />
+                    <div className='flex justify-center items-center gap-x-4 absolute bottom-40 right-50 w-full'>
+                        {Array(Math.ceil(data.roomCount / 5)).fill(0).map((_, i) => <div className=''><a href={`/home?page=${i + 1}`} className={`${page == i + 1 ? 'bg-white text-black' : 'bg-black text-white'} border-white px-4 py-2 border rounded-md`}>{i + 1}</a></div>)}
+                    </div>
                 </div>
-                <RedirectionButton link={`/canvas/${r.id}`} text="View Room"/>
-            </div>
-        ))
+            }
+        </div>
     )
 }
+export const dynamic = 'force-dynamic'

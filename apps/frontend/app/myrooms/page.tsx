@@ -1,8 +1,8 @@
 import axios from "axios";
-import { BackgroundLines } from "../components/ui/background-lines";
 import { headers } from "next/headers";
 import { Room } from "../types/types";
 import MyRooms from "../components/Room/MyRooms";
+import { DotBackground } from "../components/ui/DotBackground";
 
 export async function fetchRooms() {
     const headersList = await headers();
@@ -20,16 +20,16 @@ export async function fetchRooms() {
     }
 }
 
-export default async function Page() {
+export default async function MyRoomsPage() {
     const myRooms: Room[] = await fetchRooms();
     return (
         <>
-            <BackgroundLines className="flex flex-col z-20">
+            <DotBackground>
                 <p className="text-left px-10 text-white font-semibold font-serif text-5xl mt-10">My Rooms</p>
                 <div className="text-white bg-transparent grid grid-cols-4 gap-x-5 p-4" >
                     <MyRooms rooms={myRooms}/>
                 </div>
-            </BackgroundLines>
+            </DotBackground>
         </>
     )
 }

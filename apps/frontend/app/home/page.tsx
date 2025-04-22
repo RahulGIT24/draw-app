@@ -1,11 +1,19 @@
-import { BackgroundLines } from "../components/ui/background-lines";
-import MainMenu from "../components/MainMenu";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../lib/options";
-import Logout from "../components/Logout";
+import { DotBackground } from "../components/ui/DotBackground";
+import Header from "../components/Home/Header";
+import CreateRoom from "../components/Home/CreateRoom";
+import MyRooms from "../components/Room/MyRooms";
+import { Suspense } from "react";
+import { Loader, Loader2 } from "lucide-react";
 
-export default async function Dashboard() {
+export default async function Dashboard({
+    searchParams,
+}: {
+    searchParams?: { [key: string]: string | string[] | undefined };
+}) {
     const session = await getServerSession(authOptions);
+    const page = (await searchParams)?.page || 1;
 
     if (session === null) {
         return <div className="text-white h-screen text-center">
@@ -13,13 +21,23 @@ export default async function Dashboard() {
         </div>
     } else {
         return (
-            <BackgroundLines className="flex justify-center flex-col items-center">
-                <div className="absolute top-10 right-12">
-                <Logout/>
+            <DotBackground >
+                <Header />
+                <div className="flex justify-between items-center flex-col w-full h-full">
+                    <CreateRoom />
+                    <div className="text-white w-full  bg-transparent gap-x-5 p-4 z-40 h-[70vh]" >
+                        <Suspense fallback={
+                            <div className="h-full flex justify-center items-center -mt-32">
+                                <Loader className="animate-spin" color="white" size={200} />
+                            </div>
+                        }>
+                            <MyRooms page={Number(page)}/>
+                        </Suspense>
+                    </div>
                 </div>
-                <p className="text-white text-7xl font-bold top-20 fixed ">User Space</p>
-                <MainMenu />
-            </BackgroundLines>
+            </DotBackground>
         )
     }
 }
+
+// export const dynamic = 'auto'

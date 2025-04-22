@@ -1,9 +1,9 @@
 import { Button } from "@repo/ui/button";
-import { BackgroundLines } from "./components/ui/background-lines";
+import { DotBackground } from "./components/ui/DotBackground";
 
 export default function Home() {
     return (<>
-        <BackgroundLines className="flex text-white text-2xl justify-center flex-col items-center">
+        <DotBackground >
             <div className="tab absolute top-0 bg-zinc-900 h-20 z-20 w-full flex justify-between items-center px-6 pt-6">
                 <div>
                     {/* App Logo here */}
@@ -20,6 +20,6 @@ export default function Home() {
                 </video>
             </div>
 
-        </BackgroundLines>
+        </DotBackground>
     </>)
 }
