@@ -36,10 +36,9 @@ export async function POST(req:NextRequest,res:NextResponse){
             },{status:404})
         }
 
-        const maxExpiry = new Date();
-        maxExpiry.setDate(maxExpiry.getDate()+10);
+        const now = new Date();
 
-        if(maxExpiry>user.forgotPasswordTokenExpiry){
+        if(now>user.forgotPasswordTokenExpiry){
             await client.user.update({
                 where:{
                     id:user.id
@@ -71,6 +70,7 @@ export async function POST(req:NextRequest,res:NextResponse){
         },{status:200})
 
     } catch (error) {
+        console.log(error)
         return Response.json({
             message:"Internal Server Error"
         },{status:500})

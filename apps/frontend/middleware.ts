@@ -6,13 +6,22 @@ export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request });
     const { pathname } = request.nextUrl;
 
-    const publicPaths = ['/signin', '/signup', '/', '/forgot-password', 'recover-account', 'verify'];
+    const publicPaths = [
+        '/',
+        '/signin',
+        '/signup',
+        '/forgot-password',
+        '/recover-account',
+        '/verify'
+    ];
 
-    if (!token && !publicPaths.includes(pathname)) {
+    const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(`${path}/`));
+
+    if (!token && !isPublicPath) {
         return NextResponse.redirect(new URL('/signin', request.url));
     }
 
-    if (token && publicPaths.includes(pathname)) {
+    if (token && isPublicPath && pathname !== '/') {
         return NextResponse.redirect(new URL('/home', request.url));
     }
 
@@ -21,16 +30,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/home',
-        '/myrooms/:path*',
-        '/canvas/:path*',
-        '/',
-        '/signin',
-        '/signup',
-        '/forgot-password',
-        '/recover-account',
-        '/recover-account/:path*',
-        '/verify',
-        '/verify/:path*',
+        '/((?!_next|api|static).*)',
     ],
 };

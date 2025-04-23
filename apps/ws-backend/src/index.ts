@@ -2,11 +2,12 @@ import { WebSocket, WebSocketServer } from "ws";
 import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE, FULL } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
 import redis from "@repo/cache/cache"
-import { v4 as uuid } from 'uuid'
+import { createClient } from "redis";
+import dotenv from 'dotenv'
+import { checkUser } from "./utils";
+dotenv.config()
 
-const PORT = 8000;
-
-const wss = new WebSocketServer({ port: PORT });
+const PORT = Number(process.env.SOCKET_PORT);
 
 interface User {
     ws: WebSocket,
@@ -16,24 +17,27 @@ interface User {
 
 const users: User[] = []
 
-async function checkUser(token: string): Promise<number | null> {
-    try {
-        const user = await client.user.findFirst({
-            where: {
-                userToken: token
+const pub = createClient({
+    url: process.env.REDIS_URL
+})
+const sub = createClient({
+    url: process.env.REDIS_URL
+})
+
+pub.connect().then(() => console.log('Publisher Connected')).catch(e => console.log("Error while connecting to publisher",e))
+sub.connect().then(() => {
+    sub.subscribe('room-events', (message) => {
+        const { type, roomId, shape, userId } = JSON.parse(message);
+        const roomUsers = users.filter(user => user.rooms.includes(roomId));
+        roomUsers.forEach(user => {
+            if (userId !== user.userId && user.ws.readyState === WebSocket.OPEN) {
+                user.ws.send(JSON.stringify({ type, shape }));
             }
         })
+    })
+}).catch(e => console.log("Error while connecting to subscriber",e))
 
-        if (user) {
-            return user.id
-        }
-
-        return null;
-
-    } catch (error) {
-        return null
-    }
-}
+const wss = new WebSocketServer({ port: PORT });
 
 wss.on('connection', async (ws, request) => {
     const url = request.url;
@@ -66,10 +70,8 @@ wss.on('connection', async (ws, request) => {
             if (!creator?.rooms.includes(roomId)) {
                 return;
             }
-            const roomUsers = users.filter(user => user.rooms.includes(roomId));
 
             const shape = data.shape;
-            // shape.id = uuid()
             shape.userId = Number(creator?.userId)
             shape.roomId = Number(roomId)
 
@@ -79,14 +81,11 @@ wss.on('connection', async (ws, request) => {
                 [shape.id]: JSON.stringify({ ...shape, isDeleted: false })
             });
 
-            roomUsers.forEach(user => {
-                if (user.ws !== ws && user.ws.readyState === WebSocket.OPEN) {
-                    user.ws.send(JSON.stringify({
-                        type: DRAW_SHAPE,
-                        shape: shape
-                    }))
-                }
-            })
+            await pub.publish("room-events", JSON.stringify({
+                type: DRAW_SHAPE,
+                roomId,
+                shape,userId:userId
+            }));
         }
 
         if (type === JOIN_ROOM) {
@@ -117,8 +116,6 @@ wss.on('connection', async (ws, request) => {
                     return;
                 }
             }
-
-
 
             if (!user) return;
 
@@ -166,15 +163,11 @@ wss.on('connection', async (ws, request) => {
                 }
             }
 
-            roomUsers.forEach(user => {
-                if (user.ws !== ws && user.ws.readyState === WebSocket.OPEN) {
-                    user.ws.send(JSON.stringify({
-                        type: ERASE,
-                        shape: shape
-                    }))
-                }
-            })
-
+            await pub.publish("room-events", JSON.stringify({
+                type: ERASE,
+                roomId,
+                shape,userId
+            }));
             let shapeToDel: any = await redis.hget(`room:${roomId}:shapes`, shape.id);
 
             if (shapeToDel) {
@@ -190,7 +183,7 @@ wss.on('connection', async (ws, request) => {
     ws.on('close', () => {
         const index = users.findIndex(user => user.ws === ws);
         if (index !== -1) {
-            users.splice(index, 1); 
+            users.splice(index, 1);
         }
     });
 })

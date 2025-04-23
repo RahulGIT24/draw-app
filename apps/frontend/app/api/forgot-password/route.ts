@@ -34,7 +34,7 @@ export async function POST(req:NextRequest,res:NextResponse) {
         const tenDays = new Date();
         tenDays.setDate(tenDays.getDate()+10);
 
-        await client.user.update({
+        const update = await client.user.update({
             where:{
                 id:user.id
             },
@@ -43,6 +43,7 @@ export async function POST(req:NextRequest,res:NextResponse) {
                 forgotPasswordTokenExpiry:tenDays
             }
         })
+        console.log(update)
 
         const res = await pushToEmailQueue({subject:FORGOTPASSWORD,token})
 

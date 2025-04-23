@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 import { toast } from 'sonner';
 import CreateRoomModal from '../CreateRoomModal';
+import JoinRoomModal from '../Room/JoinRoomModal';
 
 
 const CreateRoom = () => {
     const [createRoomModal, setCreateRoomModal] = useState(false);
+    const [joinRoomModal,setJoinRoomModal] = useState(false);
     const [roomSlug, setRoomSlug] = useState<string>("")
     const router = useRouter()
     const [disabled, setDisabled] = useState(false);
@@ -38,12 +40,18 @@ const CreateRoom = () => {
     }
     return (
         <div className='relative w-full'>
-            <div className='flex justify-between items-center z-50 absolute w-full top-44  px-20'>
+            <div className='flex  justify-between items-center z-50 absolute w-full top-44  px-20'>
                 {
                     createRoomModal && <CreateRoomModal roomSlug={roomSlug} setRoomSlug={setRoomSlug} setClose={setCreateRoomModal} onSubmit={() => { createRoom() }} disabled={disabled} />
                 }
+                {
+                    joinRoomModal && <JoinRoomModal setClose={setJoinRoomModal}/>
+                }
                 <p className="text-white text-5xl font-bold"></p>
+                <div className='gap-x-4 w-full flex justify-end'>
+                <Button text='Join Room' classname='text-white hover:bg-white hover:text-black bg-zinc-800 text-xl font-semibold font-serif' onClick={() => setJoinRoomModal(true)} />
                 <Button text='+ Create Room' classname='text-white hover:bg-white hover:text-black bg-zinc-800 text-xl font-semibold font-serif' onClick={() => setCreateRoomModal(true)} />
+                </div>
             </div>
         </div>
     )

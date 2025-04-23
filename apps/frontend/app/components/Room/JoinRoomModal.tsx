@@ -32,6 +32,7 @@ export default function JoinRoomModal ({setClose}:{setClose:(b:boolean)=>void}){
             onSubmit={onSubmit}
             value={link}
             setValue={setLink}
+            disabled={false}
         />
     </div>
     )
