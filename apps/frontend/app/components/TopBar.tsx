@@ -18,7 +18,7 @@ export default function TopBar({ selectedTool, setSelectedTool, inCollaboration,
         left: 10,
         width: '100vw'
     }} className="bg-transparent">
-        <div id="curs" className={`flex justify-end  w-full px-6 ${selectedTool === 'text' && 'cursor-text'}`}>
+        <div id="curs" className={`flex justify-end h-16 w-full px-6 ${selectedTool === 'text' && 'cursor-text'}`}>
             {
                 isAdmin &&
                 <span className="">

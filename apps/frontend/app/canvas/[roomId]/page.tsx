@@ -1,16 +1,19 @@
-// import Canvas from "@/app/components/Canvas";
 import RoomCanvas from "@/app/components/Room/RoomCanvas";
 
 export default async function CanvasPage({
   params,
-  searchParams = {},
+  searchParams = undefined,
 }: {
-  params: { roomId: string };
-  searchParams?: { [key: string]: string | undefined };
+  params: Promise<{ roomId: string }>;
+  searchParams?: Promise<any> | undefined;
 }) {
-  const seachparams = await searchParams
-  const roomId = (await params).roomId
-  return <div className="h-full w-full bg-[#1E1E1E]">
-    <RoomCanvas roomId={roomId} token={seachparams.token ?? ''} />
-  </div>
+  const { roomId } = await params;
+  const resolvedSearchParams = await searchParams;
+  const token = resolvedSearchParams?.token;
+
+  return (
+    <div className="h-full w-full bg-[#1E1E1E]">
+      <RoomCanvas roomId={roomId} token={token ?? ''} />
+    </div>
+  );
 }

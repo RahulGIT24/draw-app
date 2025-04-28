@@ -3,7 +3,7 @@ import { client } from "@repo/db/prisma";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req: NextRequest, res: NextResponse) {
+export async function PUT(req: NextRequest) {
     try {
         const session = await getServerSession(authOptions);
         if (!session || !session.user) {

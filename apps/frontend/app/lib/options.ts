@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { AuthOptions } from "next-auth"
 import jwt from 'jsonwebtoken'
-import { pushToEmailQueue } from "@repo/email-service/email"
+import { pushToEmailQueue } from "@repo/email/email"
 import { SIGNUP } from "@repo/common/config"
 
 export const authOptions:AuthOptions = {
@@ -98,7 +98,6 @@ export const authOptions:AuthOptions = {
                 token.username = user.username
                 token.userToken = user.userToken;
             }
-
             return token
         },
         async session({session,token}){
@@ -108,7 +107,6 @@ export const authOptions:AuthOptions = {
                 session.user.username = token.username
                 session.user.userToken = token.userToken;
             }
-            console.log(session)
             return session
         }
     },

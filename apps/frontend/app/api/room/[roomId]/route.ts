@@ -1,9 +1,10 @@
 import { authOptions } from "@/app/lib/options";
 import { client } from "@repo/db/prisma";
 import { getServerSession } from "next-auth";
-import {v4 as uuidv4} from "uuid"
+import { NextRequest } from "next/server";
+import { v4 as uuidv4 } from "uuid"
 
-export async function GET(req: Request, { params }: { params: { roomId: string } }) {
+export async function GET(req: NextRequest) {
 
     const session = await getServerSession(authOptions);
 
@@ -18,7 +19,9 @@ export async function GET(req: Request, { params }: { params: { roomId: string }
     }
 
     try {
-        const roomId = (await params).roomId;
+        const url = new URL(req.url);
+        const pathname = url.pathname;
+        const roomId = pathname.split('/').pop();
         const { searchParams } = new URL(req.url);
 
         const token = searchParams.get('token')
@@ -57,7 +60,7 @@ export async function GET(req: Request, { params }: { params: { roomId: string }
     }
 }
 
-export async function PUT(req: Request, { params }: { params: { roomId: string } }) {
+export async function PUT(req: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (session === null) {
@@ -71,7 +74,9 @@ export async function PUT(req: Request, { params }: { params: { roomId: string }
     }
 
     try {
-        const roomId = (await params).roomId;
+        const url = new URL(req.url);
+        const pathname = url.pathname;
+        const roomId = pathname.split('/').pop();
         const { collaboration } = await req.json();
 
         if (typeof collaboration !== "boolean") {
@@ -106,8 +111,8 @@ export async function PUT(req: Request, { params }: { params: { roomId: string }
             }
         })
 
-        return Response.json({ "message": `${collaboration ? "Collaboration Started" : "Collaboration Stopped"} `,token,collaboration }, { status: 200 })
+        return Response.json({ "message": `${collaboration ? "Collaboration Started" : "Collaboration Stopped"} `, token, collaboration }, { status: 200 })
     } catch (error) {
-        return Response.json({ "message": "Internal Server Error" }, { status: 500   })
-    }   
+        return Response.json({ "message": "Internal Server Error" }, { status: 500 })
+    }
 }

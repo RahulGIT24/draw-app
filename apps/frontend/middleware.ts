@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
     const token = await getToken({ req: request });
-    const { pathname } = request.nextUrl;
+    const { pathname,searchParams } = request.nextUrl;
 
     const publicPaths = [
         '/',
@@ -21,8 +21,14 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/signin', request.url));
     }
 
+    if (pathname === '/home' && !searchParams.has('page')) {
+        const url = new URL(request.url);
+        url.searchParams.set('page', '1');
+        return NextResponse.redirect(url);
+    }
+
     if (token && isPublicPath && pathname !== '/') {
-        return NextResponse.redirect(new URL('/home', request.url));
+        return NextResponse.redirect(new URL('/home?page=1', request.url));
     }
 
     return NextResponse.next();

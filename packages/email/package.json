@@ -1,0 +1,17 @@
+{
+  "name": "@repo/email",
+  "version": "1.0.0",
+  "main": "index.js",
+  "exports":{
+    "./email":"./src/index.ts"
+  },
+  "devDependencies": {
+    "@repo/cache": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/common":"workspace:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

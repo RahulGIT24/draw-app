@@ -2,9 +2,9 @@ import { client } from "@repo/db/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from 'jsonwebtoken'
 import { FORGOTPASSWORD } from "@repo/common/config";
-import { pushToEmailQueue } from "@repo/email-service/email";
+import { pushToEmailQueue } from "@repo/email/email";
 
-export async function POST(req:NextRequest,res:NextResponse) {
+export async function POST(req:NextRequest) {
     try {
         const body  = await req.json();
 
@@ -43,7 +43,6 @@ export async function POST(req:NextRequest,res:NextResponse) {
                 forgotPasswordTokenExpiry:tenDays
             }
         })
-        console.log(update)
 
         const res = await pushToEmailQueue({subject:FORGOTPASSWORD,token})
 

@@ -1,0 +1,18 @@
+FROM node:23.8.0-alpine
+
+WORKDIR /usr/src/app
+
+RUN npm install -g pnpm
+
+COPY ../package.json ../pnpm-lock.yaml ../pnpm-workspace.yaml ../turbo.json ./
+
+COPY ../packages/common ./packages/common
+COPY ../packages/cache ./packages/cache
+COPY ../packages/typescript-config ./packages/typescript-config
+
+COPY ../apps/email-service ./apps/email-service
+
+RUN pnpm install
+RUN pnpm build
+
+CMD [ "pnpm","run", "start"]

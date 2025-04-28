@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=drawapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6380:6379"
+
+  frontend-backend:
+    build: 
+      context: .
+      dockerfile: docker-dev/Dockerfile.frontend-backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
+      - ws-backend
+
+  ws-backend:
+    build: 
+      context: .
+      dockerfile: docker-dev/Dockerfile.ws
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+  
+  general-services:
+    build: 
+      context: .
+      dockerfile: docker-dev/Dockerfile.generalservice
+    depends_on:
+      - db
+      - redis
+
+  shape-services:
+    build: 
+      context: .
+      dockerfile: docker-dev/Dockerfile.shapeservice
+    depends_on:
+      - db
+      - redis
+
+  email-services:
+    build: 
+      context: .
+      dockerfile: docker-dev/Dockerfile.emailservice
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres-data:

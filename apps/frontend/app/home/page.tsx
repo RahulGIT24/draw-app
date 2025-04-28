@@ -5,15 +5,15 @@ import Header from "../components/Home/Header";
 import CreateRoom from "../components/Home/CreateRoom";
 import MyRooms from "../components/Room/MyRooms";
 import { Suspense } from "react";
-import { Loader, Loader2 } from "lucide-react";
+import { Loader  } from "lucide-react";
 
 export default async function Dashboard({
     searchParams,
 }: {
-    searchParams?: { [key: string]: string | string[] | undefined };
+    searchParams?: Promise<any> | undefined;
 }) {
     const session = await getServerSession(authOptions);
-    const page = (await searchParams)?.page || 1;
+    const {page} = (await searchParams) ?? 1;
 
     if (session === null) {
         return <div className="text-white h-screen text-center">

@@ -39,10 +39,10 @@ export default async function MyRooms({ page }: { page: number }) {
         <div className='z-50 relative h-full'>
             {
                 data && data.rooms.length > 0 &&
-                <div key={data.roomCount}>
+                <div>
                     <ExpandableCard cards={data.rooms} />
-                    <div className='flex justify-center items-center gap-x-4 absolute bottom-40 right-50 w-full'>
-                        {Array(Math.ceil(data.roomCount / 5)).fill(0).map((_, i) => <div className=''><a href={`/home?page=${i + 1}`} className={`${page == i + 1 ? 'bg-white text-black' : 'bg-black text-white'} border-white px-4 py-2 border rounded-md`}>{i + 1}</a></div>)}
+                    <div className='flex justify-center items-center gap-x-4 absolute bottom-40 right-50 w-full' >
+                        {Array(Math.ceil(data.roomCount / 5)).fill(0).map((_, i) => <div className='' key={i}><a href={`/home?page=${i + 1}`} className={`${page == i + 1 ? 'bg-white text-black' : 'bg-black text-white'} border-white px-4 py-2 border rounded-md`}>{i + 1}</a></div>)}
                     </div>
                 </div>
             }

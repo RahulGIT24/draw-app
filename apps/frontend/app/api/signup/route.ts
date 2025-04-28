@@ -1,4 +1,4 @@
-import { pushToEmailQueue } from "@repo/email-service/email";
+import { pushToEmailQueue } from "@repo/email/email";
 import { SIGNUP } from "@repo/common/config";
 import { CreateUserSchema } from "@repo/common/zod";
 import { client } from "@repo/db/prisma";

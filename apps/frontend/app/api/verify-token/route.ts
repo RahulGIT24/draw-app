@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken"
 import { client } from "@repo/db/prisma";
 
-export async function PUT(req: NextRequest, res: NextResponse) {
+export async function PUT(req: NextRequest) {
     try {
         const url = new URL(req.url);
         const token = url.searchParams.get("token");

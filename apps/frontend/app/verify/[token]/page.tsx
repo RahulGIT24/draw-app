@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const VerifyToken = ({ params }: { params: { token: string } }) => {
+const VerifyToken = ({ params }: { params: Promise<{token:string}> }) => {
   const [message, setMessage] = useState('Verifying......');
   const [timer, setTimer] = useState(5);
   const [timerMessage, setTimerMessage] = useState<string | null>(null);
@@ -13,7 +13,7 @@ const VerifyToken = ({ params }: { params: { token: string } }) => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      const token = (await params).token;
+      const {token} = await params;
       try {
         await axios.put(`/api/verify-token?token=${token}`, {});
         setMessage('Account Verified');

@@ -4,8 +4,12 @@ import { DotBackground } from '@/app/components/ui/DotBackground';
 import { RESETPASSWORD } from '@repo/common/config';
 import React from 'react'
 
-const page = async ({ params }: { params: { token: string } }) => {
-    const token = (await params).token;
+const page = async ({
+    params,
+  }: {
+    params: Promise<{ token: string }>;
+  }) => {
+    const {token} = await params;
     return (
         <DotBackground>
             <NavBar />

@@ -2,7 +2,7 @@ import { client } from "@repo/db/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcrypt'
 
-export async function POST(req:NextRequest,res:NextResponse){
+export async function POST(req:NextRequest){
     try {
         const body = await req.json();
 
