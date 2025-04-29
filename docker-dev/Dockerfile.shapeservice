@@ -8,7 +8,7 @@ COPY ../package.json ../pnpm-lock.yaml ../pnpm-workspace.yaml ../turbo.json ./
 COPY ../packages/typescript-config/package.json ./packages/typescript-config/package.json
 COPY ../packages/db/package.json ./packages/db/package.json
 COPY ../packages/cache/package.json ./packages/cache/package.json
-COPY ../packages/shape-serviec/package.json ./packages/shape-serviec/package.json
+COPY ../apps/shape-service/package.json ./apps/shape-service/package.json
 
 RUN pnpm install
 

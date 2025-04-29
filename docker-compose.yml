@@ -27,6 +27,13 @@ services:
       - db
       - redis
       - ws-backend
+    environment:
+      - NEXTAUTH_SECRET=435453454543534553545
+      - NEXTAUTH_URL=http://localhost:3000
+      - DATABASE_URL=postgresql://root:root@db:5432/drawapp
+      - REDIS_HOST=redis
+      - REDIS_PORT=6380
+      - REDIS_PASS=
 
   ws-backend:
     build: 
@@ -37,6 +44,12 @@ services:
     depends_on:
       - db
       - redis
+    environment:
+      - REDIS_URL=redis://redis:6380
+      - SOCKET_PORT=8000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6380
+      - DATABASE_URL=postgresql://root:root@db:5432/drawapp
   
   general-services:
     build: 
@@ -45,6 +58,8 @@ services:
     depends_on:
       - db
       - redis
+    environment:
+      - DATABASE_URL=postgresql://root:root@db:5432/drawapp
 
   shape-services:
     build: 
@@ -53,6 +68,10 @@ services:
     depends_on:
       - db
       - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6380
+      - DATABASE_URL=postgresql://root:root@db:5432/drawapp
 
   email-services:
     build: 
@@ -61,6 +80,14 @@ services:
     depends_on:
       - db
       - redis
+    environment:
+      - JWT_EMAIL_SECRET='sdlklfhsklfhkldsfsdf'
+      - EMAIL_ADDRESS=#youremailaddress
+      - EMAIL_PASSWORD=#youremailpassword
+      - CLIENT_URL=http://localhost:3000/
+      - REDIS_HOST=redis
+      - REDIS_PORT=6380
+      - DATABASE_URL=postgresql://root:root@db:5432/drawapp
 
 volumes:
   postgres-data:
