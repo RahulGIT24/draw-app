@@ -5,13 +5,16 @@ WORKDIR /usr/src/app
 RUN npm install -g pnpm
 
 COPY ../package.json ../pnpm-lock.yaml ../pnpm-workspace.yaml ../turbo.json ./
+COPY ../apps/general-services/package.json ./apps/general-services/package.json
+COPY ../packages/typescript-config/package.json ./packages/typescript-config/package.json
+COPY ../packages/db/package.json ./packages/db/package.json
+
+RUN pnpm install
 
 COPY ../packages/typescript-config ./packages/typescript-config
 COPY ../packages/db ./packages/db
-
 COPY ../apps/general-services ./apps/general-services
 
-RUN pnpm install
 RUN pnpm generate
 RUN pnpm build
 

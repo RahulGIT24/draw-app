@@ -6,13 +6,18 @@ RUN npm install -g pnpm
 
 COPY ../package.json ../pnpm-lock.yaml ../pnpm-workspace.yaml ../turbo.json ./
 
+COPY ../apps/email-service/package.json ./apps/email-service/package.json
+COPY ../packages/common/package.json ./packages/common/package.json
+COPY ../packages/cache/package.json ./packages/cache/package.json
+COPY ../packages/typescript-config/package.json ./packages/typescript-config/package.json
+
+RUN pnpm install
+
 COPY ../packages/common ./packages/common
 COPY ../packages/cache ./packages/cache
 COPY ../packages/typescript-config ./packages/typescript-config
-
 COPY ../apps/email-service ./apps/email-service
 
-RUN pnpm install
 RUN pnpm build
 
 CMD [ "pnpm","run", "start"]

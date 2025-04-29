@@ -5,14 +5,18 @@ WORKDIR /usr/src/app
 RUN npm install -g pnpm
 
 COPY ../package.json ../pnpm-lock.yaml ../pnpm-workspace.yaml ../turbo.json ./
+COPY ../packages/typescript-config/package.json ./packages/typescript-config/package.json
+COPY ../packages/db/package.json ./packages/db/package.json
+COPY ../packages/cache/package.json ./packages/cache/package.json
+COPY ../packages/shape-serviec/package.json ./packages/shape-serviec/package.json
+
+RUN pnpm install
 
 COPY ../packages/cache ./packages/cache
 COPY ../packages/typescript-config ./packages/typescript-config
 COPY ../packages/db ./packages/db
-
 COPY ../apps/shape-service ./apps/shape-service
 
-RUN pnpm install
 RUN pnpm generate
 RUN pnpm build
 
