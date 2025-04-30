@@ -7,6 +7,7 @@ import React, { useState } from 'react'
 import { toast } from 'sonner';
 import CreateRoomModal from '../CreateRoomModal';
 import JoinRoomModal from '../Room/JoinRoomModal';
+import { revalidatePath } from 'next/cache';
 
 
 const CreateRoom = () => {
@@ -30,8 +31,9 @@ const CreateRoom = () => {
             const id = res.data.room.id as number;
             router.push(`/canvas/${id}`)
             toast.success("Room Created")
-        } catch (error: any) {
-            if (error.response.data.message) {
+            revalidatePath("/home")
+        } catch (error:any) {
+            if (error?.response?.data?.message) {
                 toast.error(error.response.data.message);
             }
         } finally {

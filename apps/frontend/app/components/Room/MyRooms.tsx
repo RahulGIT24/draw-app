@@ -46,6 +46,11 @@ export default async function MyRooms({ page }: { page: number }) {
                     </div>
                 </div>
             }
+            {
+                data?.rooms?.length==0 && <div className=''>
+                    <p className='px-24 text-2xl'>No Rooms Found. Create One To Get Started</p>
+                </div>
+            }
         </div>
     )
 }

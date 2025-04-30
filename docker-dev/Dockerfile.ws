@@ -21,6 +21,7 @@ COPY ../packages ./packages
 COPY ../apps/ws-backend ./apps/ws-backend
 
 RUN pnpm generate
+RUN pnpm migrate
 RUN pnpm build
 
 CMD [ "pnpm","run", "start"]

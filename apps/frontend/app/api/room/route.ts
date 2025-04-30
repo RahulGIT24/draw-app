@@ -21,16 +21,27 @@ export async function POST(req: Request) {
 
     await redis.del(key)
     try {
+        const existingRooms = await client.room.findFirst({
+            where: {
+                adminid: Number(userId),
+                slug: parsedData.data.slug.toLowerCase()
+            }
+        })
+
+        if(existingRooms){
+            return Response.json({ "message": "Room With Same Slug Exists" }, { status: 400 })
+        }
 
         const room = await client.room.create({
             data: {
                 adminid: Number(userId),
-                slug: parsedData.data.slug
+                slug: parsedData.data.slug.toLowerCase()
             }
         })
         return Response.json({ "message": "created", room }, { status: 201 })
 
     } catch (e: any) {
+        console.log(e)
         throw new Error(e);
     }
 }

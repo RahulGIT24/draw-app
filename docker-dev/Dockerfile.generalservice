@@ -15,7 +15,8 @@ COPY ../packages/typescript-config ./packages/typescript-config
 COPY ../packages/db ./packages/db
 COPY ../apps/general-services ./apps/general-services
 
-RUN pnpm generate
+RUN pnpm migrate
+RUN pnpm migrate
 RUN pnpm build
 
 CMD [ "pnpm","run", "start"]

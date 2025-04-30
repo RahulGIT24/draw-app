@@ -21,6 +21,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/signin', request.url));
     }
 
+    if (pathname === '/' && token) {
+        const url = new URL('/home', request.url);
+        url.searchParams.set('page', '1');
+        return NextResponse.redirect(url);
+    }
+
     if (pathname === '/home' && !searchParams.has('page')) {
         const url = new URL(request.url);
         url.searchParams.set('page', '1');

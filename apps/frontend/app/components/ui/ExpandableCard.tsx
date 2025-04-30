@@ -3,20 +3,43 @@
 import React, { RefObject, useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "../../hooks/use-outside-click";
+import axios from "axios";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type card = {
-  slug:string,
-  createdAt:Date,
-  id:number,
-  img?:string
+  slug: string,
+  createdAt: Date,
+  id: number,
+  img?: string,
 }
-export function ExpandableCard({cards}:{cards:card[]}) {
-  
+export function ExpandableCard({ cards }: { cards: card[] }) {
   const [active, setActive] = useState<card | null | boolean>(
     null
   );
+  const router = useRouter();
+  const [disabled,setDisabled] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
+
+  const deleteRoom = async (roomId: number) => {
+    if (!roomId) return;
+    const url = `/api/delete-room/${roomId}`
+
+    try {
+      setDisabled(true);
+      const res = await axios.delete(url, {})
+      toast.success(res.data.message)
+      router.refresh()
+    } catch (error: any) {
+      if (error?.response?.data?.message) {
+        toast.error(error.response.data.message)
+      }
+    }finally{
+      setDisabled(false);
+      setActive(null);
+    }
+  }
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -103,14 +126,23 @@ export function ExpandableCard({cards}:{cards:card[]}) {
                       {active.createdAt.toDateString()}
                     </motion.p>
                   </div>
-
-                  <motion.a
-                    layoutId={`button-${active.slug}-${id}`}
-                    href={`/canvas/${active.id}`}
-                    className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
-                  >
-                    Visit Room
-                  </motion.a>
+                  <div className="flex justify-center items-center gap-x-2">
+                    <motion.a
+                      layoutId={`button-${active.slug}-${id}`}
+                      href={`/canvas/${active.id}`}
+                      className="px-3 py-2 text-sm rounded-full font-bold bg-green-800 hover:bg-green-700 text-white"
+                    >
+                      Visit Room
+                    </motion.a>
+                    <motion.button
+                      layoutId={`1`}
+                      disabled={disabled}
+                      onClick={() => { deleteRoom(Number(active.id)) }}
+                      className="px-3 py-2 text-sm rounded-full font-bold bg-red-800 hover:bg-red-700 hover:text-white text-white mt-4 md:mt-0"
+                    >
+                      Delete Room
+                    </motion.button>
+                  </div>
                 </div>
                 <div className="pt-4 relative px-4">
                   <motion.div

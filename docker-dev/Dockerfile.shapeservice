@@ -18,6 +18,7 @@ COPY ../packages/db ./packages/db
 COPY ../apps/shape-service ./apps/shape-service
 
 RUN pnpm generate
+RUN pnpm migrate
 RUN pnpm build
 
 CMD [ "pnpm","run", "start"]
