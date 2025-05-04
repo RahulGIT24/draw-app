@@ -20,8 +20,7 @@ COPY ../packages ./packages
 
 COPY ../apps/ws-backend ./apps/ws-backend
 
-RUN pnpm generate
-RUN pnpm migrate
+RUN pnpm run db:generate
 RUN pnpm build
 
-CMD [ "pnpm","run", "start"]
+CMD [ "sh","-c", "pnpm db:migrate && pnpm run start:ws-backend"]

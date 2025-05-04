@@ -1,5 +1,8 @@
 import { client } from '@repo/db/prisma'
 import cron from 'node-cron'
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 async function cleanUp() {
     try {

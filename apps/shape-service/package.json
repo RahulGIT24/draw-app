@@ -5,19 +5,20 @@
   "scripts": {
     "build": "tsc -b",
     "dev": "npm run build && nodemon dist/index.js",
-    "start":"node dist/index.js"
+    "start": "node dist/index.js"
   },
   "devDependencies": {
+    "@repo/cache": "workspace:*",
+    "@repo/db": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node-cron": "^3.0.11",
-    "@repo/cache":"workspace:*",
-    "@repo/db":"workspace:*"
+    "@types/node-cron": "^3.0.11"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^16.5.0",
     "node-cron": "^3.0.3"
   }
 }

@@ -20,4 +20,4 @@ COPY ../apps/email-service ./apps/email-service
 
 RUN pnpm build
 
-CMD [ "pnpm","run", "start"]
+CMD [ "pnpm","run", "start:email-service"]

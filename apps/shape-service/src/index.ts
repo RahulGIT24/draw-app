@@ -1,6 +1,9 @@
 import { client } from '@repo/db/prisma';
 import redis from '@repo/cache/cache';
 import cron from 'node-cron';
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 async function syncShapesToDB() {
     try {

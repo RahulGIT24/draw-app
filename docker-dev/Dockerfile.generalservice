@@ -15,8 +15,7 @@ COPY ../packages/typescript-config ./packages/typescript-config
 COPY ../packages/db ./packages/db
 COPY ../apps/general-services ./apps/general-services
 
-RUN pnpm migrate
-RUN pnpm migrate
+RUN pnpm run db:generate
 RUN pnpm build
 
-CMD [ "pnpm","run", "start"]
+CMD ["sh", "-c", "pnpm run db:migrate && pnpm run start:general-services"]

@@ -1,5 +1,5 @@
 {
-  "name": "excalidraw",
+  "name": "drawapp",
   "private": true,
   "scripts": {
     "build": "turbo run build",
@@ -8,8 +8,13 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "migrate": "cd packages/db && npx prisma migrate dev",
-    "generate": "cd packages/db && npx prisma generate"
+    "db:migrate": "cd packages/db && npx prisma migrate dev",
+    "db:generate": "cd packages/db && npx prisma generate",
+    "start:email-service": "cd apps/email-service && pnpm run start",
+    "start:web": "cd apps/frontend && pnpm run start",
+    "start:general-services": "cd apps/general-services && pnpm run start",
+    "start:shape-service": "cd apps/shape-service && pnpm run start",
+    "start:ws-backend": "cd apps/ws-backend && pnpm run start"
   },
   "devDependencies": {
     "prettier": "^3.5.0",

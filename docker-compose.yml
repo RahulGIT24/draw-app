@@ -7,7 +7,7 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=drawapp
     ports:
-      - "5432:5432"
+      - "5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
   
@@ -21,6 +21,11 @@ services:
     build: 
       context: .
       dockerfile: docker-dev/Dockerfile.frontend-backend
+      args:
+          DATABASE_URL: postgresql://root:root@db:5432/drawapp
+          REDIS_HOST: redis
+          REDIS_PORT: 6380
+          REDIS_PASS: ""
     ports:
       - "3000:3000"
     depends_on:
@@ -32,62 +37,73 @@ services:
       - NEXTAUTH_URL=http://localhost:3000
       - DATABASE_URL=postgresql://root:root@db:5432/drawapp
       - REDIS_HOST=redis
-      - REDIS_PORT=6380
+      - REDIS_PORT=6379
       - REDIS_PASS=
+    
 
   ws-backend:
     build: 
       context: .
       dockerfile: docker-dev/Dockerfile.ws
+      args:
+          DATABASE_URL: postgresql://root:root@db:5432/drawapp
     ports:
       - "8000:8000"
     depends_on:
       - db
       - redis
     environment:
-      - REDIS_URL=redis://redis:6380
+      - REDIS_URL=redis://redis:6379
       - SOCKET_PORT=8000
       - REDIS_HOST=redis
-      - REDIS_PORT=6380
+      - REDIS_PORT=6379
       - DATABASE_URL=postgresql://root:root@db:5432/drawapp
+    
   
   general-services:
     build: 
       context: .
       dockerfile: docker-dev/Dockerfile.generalservice
+      args:
+          DATABASE_URL: postgresql://root:root@db:5432/drawapp
     depends_on:
       - db
       - redis
     environment:
       - DATABASE_URL=postgresql://root:root@db:5432/drawapp
+    
 
   shape-services:
     build: 
       context: .
       dockerfile: docker-dev/Dockerfile.shapeservice
+      args:
+          DATABASE_URL: postgresql://root:root@db:5432/drawapp
     depends_on:
       - db
       - redis
     environment:
       - REDIS_HOST=redis
-      - REDIS_PORT=6380
+      - REDIS_PORT=6379
       - DATABASE_URL=postgresql://root:root@db:5432/drawapp
+    
 
   email-services:
     build: 
       context: .
       dockerfile: docker-dev/Dockerfile.emailservice
+      args:
+          DATABASE_URL: postgresql://root:root@db:5432/drawapp
     depends_on:
       - db
       - redis
     environment:
       - JWT_EMAIL_SECRET='sdlklfhsklfhkldsfsdf'
-      - EMAIL_ADDRESS=#youremailaddress
-      - EMAIL_PASSWORD=#youremailpassword
       - CLIENT_URL=http://localhost:3000/
       - REDIS_HOST=redis
-      - REDIS_PORT=6380
+      - REDIS_PORT=6379
       - DATABASE_URL=postgresql://root:root@db:5432/drawapp
+    
 
 volumes:
   postgres-data:

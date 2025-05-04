@@ -17,8 +17,7 @@ COPY ../packages/typescript-config ./packages/typescript-config
 COPY ../packages/db ./packages/db
 COPY ../apps/shape-service ./apps/shape-service
 
-RUN pnpm generate
-RUN pnpm migrate
+RUN pnpm run db:generate
 RUN pnpm build
 
-CMD [ "pnpm","run", "start"]
+CMD [ "sh","-c", "pnpm db:migrate && pnpm run start:shape-service"]
