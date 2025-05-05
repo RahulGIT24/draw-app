@@ -102,6 +102,8 @@ services:
       - CLIENT_URL=http://localhost:3000/
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - EMAIL_ADDRESS=
+      - EMAIL_PASSWORD=
 
 volumes:
   postgres-data:
