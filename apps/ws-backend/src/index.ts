@@ -1,5 +1,5 @@
 import { WebSocket, WebSocketServer } from "ws";
-import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE, FULL } from "@repo/common/config"
+import { DRAW_SHAPE, ERASE, JOIN_ROOM, LEAVE_ROOM, SHAPE, FULL, OFF_COLLABORATION } from "@repo/common/config"
 import { client } from "@repo/db/prisma"
 import redis from "@repo/cache/cache"
 import { createClient } from "redis";
@@ -86,6 +86,20 @@ wss.on('connection', async (ws, request) => {
                 roomId,
                 shape,userId:userId
             }));
+        }
+
+        if(type===OFF_COLLABORATION){
+            const roomId = data.roomId;
+            if (!roomId) {
+                return;
+            }
+            const roomUsers = users.filter(user => user.rooms.includes(roomId) && user.ws !== ws);
+            if(roomUsers.length>=1){
+                roomUsers.map((u:User)=>u.ws.send(JSON.stringify({
+                    type:OFF_COLLABORATION,
+                    message:"Collaboration is turned off for this room"
+                })))
+            }
         }
 
         if (type === JOIN_ROOM) {

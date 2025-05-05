@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 import { Game } from "../game/Game";
 import CollaborateModal from "./CollaborateModal";
-import { JOIN_ROOM, WS_URL } from "@repo/common/config";
+import { JOIN_ROOM, STOP_COLLAB, WS_URL } from "@repo/common/config";
 import { Tools } from "../types/types";
 import TopBar from "./TopBar";
 import Footer from "./Footer";
@@ -30,6 +30,15 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
             }))
         }
     }, [])
+
+    function stopCollaboration(roomId:number){
+        if(socket){
+            socket.send(JSON.stringify({
+                type: STOP_COLLAB,
+                roomId: roomId
+            }))
+        }
+    }
 
     const [game, setGame] = useState<Game>()
 

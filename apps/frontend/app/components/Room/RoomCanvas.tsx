@@ -38,13 +38,22 @@ export default async function RoomCanvas({ roomId, token }: { roomId: string, to
     const session = await getServerSession(authOptions);
     const userToken = session?.user.userToken;
 
-    if (res == null || res.valid === false) {
+    if ((res == null || res.valid === false) && token) {
         return (
             <div className="h-screen w-full flex justify-center flex-col gap-y-7 items-center bg-zinc-800 text-white font-bold text-3xl">
-                <p>Invalid Joining URL or Room Not Exists</p>
+                <p>Collaboration is turned off for this room</p>
                 <RedirectionButton link={`/`} text="Go Back" />
             </div>
         );
+    }
+
+    if(res == null || res.valid === false){
+        return (
+            <div className="h-screen w-full flex justify-center flex-col gap-y-7 items-center bg-zinc-800 text-white font-bold text-3xl">
+                <p>Invalid Room URL</p>
+                <RedirectionButton link={`/`} text="Go Back" />
+            </div>
+        )
     }
 
     return (

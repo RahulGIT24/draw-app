@@ -1,6 +1,6 @@
 import { getExistingShapes } from "./http"
 import { COLOR, Shape, Shapes } from "../types/types"
-import { DRAW_SHAPE, ERASE, FULL } from "@repo/common/config"
+import { DRAW_SHAPE, ERASE, FULL, OFF_COLLABORATION } from "@repo/common/config"
 import { toast } from "sonner"
 import { v4 as uuid } from 'uuid'
 
@@ -128,6 +128,11 @@ export class Game {
             }
             if (message.type === FULL) {
                 toast.info(message.message);
+                return;
+            }
+            if(message.type===OFF_COLLABORATION){
+                toast.error(message.message);
+                location.reload()
                 return;
             }
         }
