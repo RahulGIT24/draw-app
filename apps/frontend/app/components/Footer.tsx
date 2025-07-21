@@ -13,7 +13,7 @@ const Footer = ({ currentScale, setScale }: Props) => {
     return (
         <span className='text-white bottom-10 text-3xl left-10 absolute flex justify-between items-center w-[10%] bg-gray-500 px-6 select-none py-2'>
             <button onClick={() => setScale((prev: number) => {
-                if (prev == 10) {
+                if (prev == 50) {
                     return prev
                 }
                 return prev - 10

@@ -31,8 +31,8 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
         }
     }, [])
 
-    function stopCollaboration(roomId:number){
-        if(socket){
+    function stopCollaboration(roomId: number) {
+        if (socket) {
             socket.send(JSON.stringify({
                 type: STOP_COLLAB,
                 roomId: roomId
@@ -70,6 +70,16 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
         }
     }, [currentScale])
 
+    useEffect(() => {
+        function updateDimensions() {
+            setWindowW(window.innerWidth);
+            setWindowH(window.innerHeight);
+        }
+        updateDimensions();
+        window.addEventListener('resize', updateDimensions);
+        return () => window.removeEventListener('resize', updateDimensions);
+    }, []);
+
     return (
         <>
             {
@@ -80,7 +90,7 @@ export default function Canvas({ roomId, IsCollaborating, isAdmin, collaboration
             {
                 game &&
                 <>
-                    <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} func={() => setCollaborateModal(true)} setStrokeStyle={game.setStrokeStyle}/>
+                    <TopBar isAdmin={isAdmin} selectedTool={selectedTool} setSelectedTool={setSelectedTool} inCollaboration={isCollaborating} func={() => setCollaborateModal(true)} setStrokeStyle={game.setStrokeStyle} />
                     <Footer currentScale={currentScale} setScale={setCurrentScale} />
                 </>
             }
