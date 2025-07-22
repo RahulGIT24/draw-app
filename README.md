@@ -26,8 +26,7 @@
 - **Authentication**: [NextAuth.js](https://next-auth.js.org/)  
 - **Real-time Communication**: Socket.IO + Redis Pub/Sub  
 - **Job Queues**: Redis Queues for background tasks
-- **Database**: PostgreSQL  
-- **Deployment**: Vercel (frontend) + Node/Docker for socket server  
+- **Database**: PostgreSQL   
 
 ---
 ## ⚡ Installation & Setup using `Docker`
