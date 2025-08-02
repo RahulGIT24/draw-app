@@ -4,6 +4,9 @@
 
 ---
 
+## Demo Video
+[![Watch the video](./demo/cover.png)](https://drive.google.com/file/d/1MNp7cL94q9ZZtsnVhW3ZCtboxnDxOa-k/view?usp=sharing)
+
 ## 🚀 Features  
 
 - ✅ **Real-time Collaboration** with Socket.IO  
